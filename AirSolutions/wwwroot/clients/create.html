@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nuevo cliente - AirSolutions</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/site.css" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="/">AirSolutions</a>
+      <div class="collapse navbar-collapse">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link active" href="index.html">Clientes</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container my-4">
+    <div class="d-flex align-items-center gap-2 mb-4">
+      <a class="btn btn-outline-secondary btn-sm" href="index.html">← Lista</a>
+      <h1 class="h2 mb-0">Nuevo cliente</h1>
+    </div>
+
+    <div id="alertPlaceholder"></div>
+    <form id="form" class="needs-validation" novalidate>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Tipo de cliente <span class="text-danger">*</span></label>
+          <select class="form-select" name="clientType" required>
+            <option value="">Seleccione...</option>
+            <option value="Individual">Individual</option>
+            <option value="Company">Empresa</option>
+          </select>
+        </div>
+        <div class="col-md-6" id="wrapCompanyName" style="display:none;">
+          <label class="form-label">Nombre de la empresa <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" name="companyName" maxlength="300">
+        </div>
+        <div class="col-12"><hr class="my-2"></div>
+        <div class="col-md-6">
+          <label class="form-label">Nombre <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" name="firstName" required maxlength="200">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Apellido</label>
+          <input type="text" class="form-control" name="lastName" maxlength="200">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Teléfono <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" name="phone" required maxlength="50">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Teléfono secundario</label>
+          <input type="text" class="form-control" name="secondaryPhone" maxlength="50">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" name="email" maxlength="200">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Documento (RUC/Cédula)</label>
+          <input type="text" class="form-control" name="documentNumber" maxlength="100">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Dirección</label>
+          <input type="text" class="form-control" name="address" maxlength="500">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Sector</label>
+          <input type="text" class="form-control" name="sector" maxlength="200">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Ciudad</label>
+          <input type="text" class="form-control" name="city" maxlength="200">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Forma de pago preferida</label>
+          <input type="text" class="form-control" name="preferredPaymentMethod" maxlength="100">
+        </div>
+        <div class="col-md-6">
+          <div class="form-check mt-4">
+            <input class="form-check-input" type="checkbox" name="isActive" id="isActive" checked>
+            <label class="form-check-label" for="isActive">Activo</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Notas</label>
+          <textarea class="form-control" name="notes" rows="3" maxlength="2000"></textarea>
+        </div>
+        <div class="col-12">
+          <button type="submit" class="btn btn-primary">Guardar</button>
+          <a class="btn btn-outline-secondary" href="index.html">Cancelar</a>
+        </div>
+      </div>
+    </form>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API = '/api/clients';
+    const form = document.getElementById('form');
+    const wrapCompanyName = document.getElementById('wrapCompanyName');
+    const alertPlaceholder = document.getElementById('alertPlaceholder');
+
+    document.querySelector('select[name="clientType"]').addEventListener('change', function() {
+      wrapCompanyName.style.display = this.value === 'Company' ? 'block' : 'none';
+      form.querySelector('[name="companyName"]').required = this.value === 'Company';
+    });
+
+    function showAlert(msg, type) {
+      alertPlaceholder.innerHTML = '<div class="alert alert-' + type + '">' + msg + '</div>';
+    }
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      if (!form.checkValidity()) { form.classList.add('was-validated'); return; }
+      const fd = new FormData(form);
+      const payload = {
+        clientType: fd.get('clientType') || '',
+        firstName: fd.get('firstName') || '',
+        lastName: fd.get('lastName') || null,
+        companyName: fd.get('companyName') || null,
+        documentNumber: fd.get('documentNumber') || null,
+        phone: fd.get('phone') || '',
+        secondaryPhone: fd.get('secondaryPhone') || null,
+        email: fd.get('email') || null,
+        address: fd.get('address') || null,
+        sector: fd.get('sector') || null,
+        city: fd.get('city') || null,
+        notes: fd.get('notes') || null,
+        preferredPaymentMethod: fd.get('preferredPaymentMethod') || null,
+        isActive: form.querySelector('[name="isActive"]').checked,
+        createdAt: new Date().toISOString()
+      };
+      fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+        .then(r => r.json().then(data => ({ ok: r.ok, data })))
+        .then(({ ok, data }) => {
+          if (ok) {
+            showAlert('Cliente creado correctamente.', 'success');
+            setTimeout(() => location.href = 'view.html?id=' + data.id, 1200);
+          } else {
+            showAlert((data.errors && data.errors.join('<br>')) || 'Error al guardar.', 'danger');
+          }
+        })
+        .catch(() => showAlert('Error de conexión.', 'danger'));
+    });
+  </script>
+</body>
+</html>

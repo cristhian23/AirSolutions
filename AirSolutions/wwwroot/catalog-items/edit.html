@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Editar item - AirSolutions</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/site.css" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="/">AirSolutions</a>
+      <div class="collapse navbar-collapse">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="../clients/">Clientes</a></li>
+          <li class="nav-item"><a class="nav-link active" href="index.html">Catálogo</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container my-4">
+    <div class="d-flex align-items-center gap-2 mb-4">
+      <a class="btn btn-outline-secondary btn-sm" href="index.html">← Lista</a>
+      <h1 class="h2 mb-0">Editar item</h1>
+    </div>
+
+    <div id="alertPlaceholder"></div>
+    <form id="form" class="needs-validation" novalidate>
+      <input type="hidden" name="id" id="itemId">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Nombre <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" name="name" required maxlength="300">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Tipo de item <span class="text-danger">*</span></label>
+          <select class="form-select" name="itemType" required>
+            <option value="Service">Servicio</option>
+            <option value="Product">Producto</option>
+            <option value="Material">Material</option>
+            <option value="Other">Otro</option>
+          </select>
+        </div>
+        <div class="col-md-6" id="wrapNivel" style="display:none;">
+          <label class="form-label">Nivel (piso) <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" name="nivel" maxlength="50" placeholder="Ej: 1, 2, 3, Planta Baja...">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">SKU</label>
+          <input type="text" class="form-control" name="sku" maxlength="100">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Descripción</label>
+          <textarea class="form-control" name="description" rows="3" maxlength="1000"></textarea>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Unidad</label>
+          <input type="text" class="form-control" name="unit" maxlength="50" placeholder="Ej: unidad, kg, m²...">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Precio base</label>
+          <input type="number" step="0.01" class="form-control" name="basePrice" placeholder="0.00">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Costo</label>
+          <input type="number" step="0.01" class="form-control" name="cost" placeholder="0.00">
+        </div>
+        <div class="col-md-6">
+          <div class="form-check mt-4">
+            <input class="form-check-input" type="checkbox" name="isTaxable" id="isTaxable">
+            <label class="form-check-label" for="isTaxable">Gravable (impuestos)</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-check mt-4">
+            <input class="form-check-input" type="checkbox" name="isActive" id="isActive">
+            <label class="form-check-label" for="isActive">Activo</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <button type="submit" class="btn btn-primary">Guardar cambios</button>
+          <a class="btn btn-outline-secondary" href="index.html">Cancelar</a>
+          <a class="btn btn-outline-info" id="linkView">Ver item</a>
+        </div>
+      </div>
+    </form>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API = '/api/catalogitems';
+    const params = new URLSearchParams(location.search);
+    const id = params.get('id');
+    const form = document.getElementById('form');
+    const wrapNivel = document.getElementById('wrapNivel');
+    const alertPlaceholder = document.getElementById('alertPlaceholder');
+
+    if (!id) { location.href = 'index.html'; throw 'no id'; }
+
+    document.querySelector('select[name="itemType"]').addEventListener('change', function() {
+      wrapNivel.style.display = this.value === 'Service' ? 'block' : 'none';
+      form.querySelector('[name="nivel"]').required = this.value === 'Service';
+    });
+
+    function showAlert(msg, type) {
+      alertPlaceholder.innerHTML = '<div class="alert alert-' + type + '">' + msg + '</div>';
+    }
+
+    fetch(API + '/' + id)
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then(data => {
+        document.getElementById('itemId').value = data.id;
+        form.querySelector('[name="name"]').value = data.name || '';
+        form.querySelector('[name="description"]').value = data.description || '';
+        form.querySelector('[name="itemType"]').value = data.itemType || 'Service';
+        form.querySelector('[name="nivel"]').value = data.nivel || '';
+        form.querySelector('[name="sku"]').value = data.sku || '';
+        form.querySelector('[name="unit"]').value = data.unit || '';
+        form.querySelector('[name="basePrice"]').value = data.basePrice != null ? data.basePrice : '';
+        form.querySelector('[name="cost"]').value = data.cost != null ? data.cost : '';
+        form.querySelector('[name="isTaxable"]').checked = data.isTaxable === true;
+        form.querySelector('[name="isActive"]').checked = data.isActive !== false;
+        wrapNivel.style.display = data.itemType === 'Service' ? 'block' : 'none';
+        form.querySelector('[name="nivel"]').required = data.itemType === 'Service';
+        document.getElementById('linkView').href = 'view.html?id=' + data.id;
+      })
+      .catch(() => { showAlert('Item no encontrado.', 'danger'); });
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      if (!form.checkValidity()) { form.classList.add('was-validated'); return; }
+      const fd = new FormData(form);
+      const basePrice = fd.get('basePrice');
+      const cost = fd.get('cost');
+      const payload = {
+        id: parseInt(fd.get('id'), 10),
+        name: fd.get('name') || '',
+        description: fd.get('description') || null,
+        itemType: fd.get('itemType') || '',
+        nivel: fd.get('nivel') || null,
+        sku: fd.get('sku') || null,
+        unit: fd.get('unit') || null,
+        basePrice: basePrice ? parseFloat(basePrice) : null,
+        cost: cost ? parseFloat(cost) : null,
+        isTaxable: form.querySelector('[name="isTaxable"]').checked,
+        isActive: form.querySelector('[name="isActive"]').checked
+      };
+      fetch(API + '/' + id, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+        .then(r => r.json().then(data => ({ ok: r.ok, data })))
+        .then(({ ok, data }) => {
+          if (ok) {
+            showAlert('Cambios guardados.', 'success');
+          } else {
+            showAlert((data.errors && data.errors.join('<br>')) || 'Error al guardar.', 'danger');
+          }
+        })
+        .catch(() => showAlert('Error de conexión.', 'danger'));
+    });
+  </script>
+</body>
+</html>

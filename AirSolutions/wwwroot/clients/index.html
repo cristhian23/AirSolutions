@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clientes - AirSolutions</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/site.css" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="/">AirSolutions</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link active" href="index.html">Clientes</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container my-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+      <h1 class="h2 mb-0">Clientes</h1>
+      <a class="btn btn-primary" href="create.html">Nuevo cliente</a>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <form id="formSearch" class="row g-2">
+          <div class="col-md-5">
+            <label class="form-label visually-hidden">Buscar</label>
+            <input type="text" class="form-control" id="search" name="search" placeholder="Nombre o teléfono...">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label visually-hidden">Estado</label>
+            <select class="form-select" id="filterActive" name="isActive">
+              <option value="">Todos</option>
+              <option value="true">Activos</option>
+              <option value="false">Inactivos</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-outline-primary w-100">Buscar</button>
+          </div>
+          <div class="col-md-2">
+            <button type="button" class="btn btn-outline-secondary w-100" id="btnClear">Limpiar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="alertPlaceholder"></div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Id</th>
+            <th>Tipo</th>
+            <th>Nombre / Empresa</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th>Activo</th>
+            <th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td colspan="7" class="text-center text-muted">Cargando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API = '/api/clients';
+    const tbody = document.getElementById('tbody');
+    const formSearch = document.getElementById('formSearch');
+    const searchInput = document.getElementById('search');
+    const filterActive = document.getElementById('filterActive');
+    const btnClear = document.getElementById('btnClear');
+    const alertPlaceholder = document.getElementById('alertPlaceholder');
+
+    function showAlert(message, type = 'danger') {
+      alertPlaceholder.innerHTML = '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>';
+    }
+
+    function loadClients() {
+      const params = new URLSearchParams();
+      const search = searchInput.value.trim();
+      const isActive = filterActive.value;
+      if (search) params.set('search', search);
+      if (isActive) params.set('isActive', isActive);
+      const url = params.toString() ? API + '?' + params : API;
+
+      tbody.innerHTML = '<tr><td colspan="7" class="text-center">Cargando...</td></tr>';
+      fetch(url)
+        .then(r => { if (!r.ok) throw new Error('Error al cargar'); return r.json(); })
+        .then(data => {
+          if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No hay clientes.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = data.map(c => {
+            const name = c.clientType === 'Company' ? (c.companyName || '-') : ((c.firstName || '') + ' ' + (c.lastName || '')).trim() || '-';
+            return '<tr>' +
+              '<td>' + c.id + '</td>' +
+              '<td>' + (c.clientType === 'Company' ? 'Empresa' : 'Individual') + '</td>' +
+              '<td>' + escapeHtml(name) + '</td>' +
+              '<td>' + escapeHtml(c.phone || '') + '</td>' +
+              '<td>' + escapeHtml(c.email || '-') + '</td>' +
+              '<td>' + (c.isActive ? '<span class="badge bg-success">Sí</span>' : '<span class="badge bg-secondary">No</span>') + '</td>' +
+              '<td class="text-end"><a class="btn btn-sm btn-outline-info me-1" href="view.html?id=' + c.id + '">Ver</a><a class="btn btn-sm btn-outline-primary me-1" href="edit.html?id=' + c.id + '">Editar</a><button type="button" class="btn btn-sm btn-outline-danger" data-id="' + c.id + '" data-name="' + escapeHtml(name) + '">Eliminar</button></td>' +
+              '</tr>';
+          }).join('');
+          tbody.querySelectorAll('button[data-id]').forEach(btn => {
+            btn.addEventListener('click', () => deleteClient(btn.dataset.id, btn.dataset.name));
+          });
+        })
+        .catch(() => { tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error al cargar la lista.</td></tr>'; });
+    }
+
+    function escapeHtml(s) {
+      const div = document.createElement('div');
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    function deleteClient(id, name) {
+      if (!confirm('¿Eliminar el cliente "' + name + '"?')) return;
+      fetch(API + '/' + id, { method: 'DELETE' })
+        .then(r => { if (!r.ok) throw new Error(); loadClients(); showAlert('Cliente eliminado.', 'success'); })
+        .catch(() => showAlert('No se pudo eliminar.'));
+    }
+
+    formSearch.addEventListener('submit', e => { e.preventDefault(); loadClients(); });
+    btnClear.addEventListener('click', () => { searchInput.value = ''; filterActive.value = ''; loadClients(); });
+    loadClients();
+  </script>
+</body>
+</html>

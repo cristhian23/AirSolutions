@@ -1,0 +1,9 @@
+el próximo paso es que te implemente también la UI en Bootstrap para:
+Listar cotizaciones.
+Crear/editar/ver detalladamente:
+Selector de cliente con búsqueda + botón “Nuevo cliente” (modal).
+Botón “Agregar línea desde catálogo” que busque en CatalogItems y rellene la línea (precio editable).
+Opción “Crear desde plantilla” para copiar una cotización existente.
+
+todo eso debe seguir el mismo disenio que tiene los otros dos modulos.
+Otra IA ya hizo el backend, dijo que solo falta la parte de ui del modulo de cotizaciones
