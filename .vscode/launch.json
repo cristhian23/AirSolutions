@@ -1,0 +1,26 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "AirSolutions (ASP.NET Core)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/AirSolutions/bin/Debug/net10.0/AirSolutions.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/AirSolutions",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            }
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Abrir en Chrome (cuando el servidor esté corriendo)",
+            "url": "http://localhost:5158",
+            "webRoot": "${workspaceFolder}/AirSolutions/wwwroot"
+        }
+    ]
+}
