@@ -1,0 +1,213 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Detalle de cotizacion - AirSolutions</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/site.css" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="/">AirSolutions</a>
+      <div class="collapse navbar-collapse">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="../clients/">Clientes</a></li>
+          <li class="nav-item"><a class="nav-link" href="../catalog-items/">Catalogo</a></li>
+          <li class="nav-item"><a class="nav-link active" href="index.html">Cotizaciones</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container my-4">
+    <div class="d-flex align-items-center gap-2 mb-4 flex-wrap">
+      <a class="btn btn-outline-secondary btn-sm" href="index.html">Volver</a>
+      <h1 class="h2 mb-0">Detalle de cotizacion</h1>
+      <button type="button" class="btn btn-outline-success btn-sm ms-auto" id="btnPdf">Descargar PDF</button>
+      <a class="btn btn-primary btn-sm" id="linkEdit">Editar</a>
+    </div>
+
+    <div id="alertPlaceholder"></div>
+
+    <div class="card mb-3" id="headerCard">
+      <div class="card-body text-muted text-center">Cargando...</div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header bg-light">
+        <span class="fw-semibold">Lineas</span>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Nombre</th>
+                <th>Descripcion</th>
+                <th class="text-end">Cantidad</th>
+                <th class="text-end">Precio unitario</th>
+                <th class="text-end">Desc %</th>
+                <th class="text-end">ITBIS %</th>
+                <th class="text-end">Subtotal</th>
+                <th class="text-end">Descuento</th>
+                <th class="text-end">ITBIS</th>
+                <th class="text-end">Total</th>
+              </tr>
+            </thead>
+            <tbody id="linesBody">
+              <tr><td colspan="10" class="text-center text-muted py-4">Cargando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="row justify-content-end">
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <table class="table table-sm mb-0">
+              <tr><th>Subtotal</th><td class="text-end" id="summarySubtotal">RD$ 0.00</td></tr>
+              <tr><th>Descuento</th><td class="text-end" id="summaryDiscount">RD$ 0.00</td></tr>
+              <tr><th>ITBIS</th><td class="text-end" id="summaryTax">RD$ 0.00</td></tr>
+              <tr class="table-light fw-semibold"><th>Total</th><td class="text-end" id="summaryTotal">RD$ 0.00</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+  <script src="../js/quote-pdf.js"></script>
+  <script>
+    const quoteId = new URLSearchParams(location.search).get('id');
+    if (!quoteId) {
+      location.href = 'index.html';
+      throw new Error('ID requerido');
+    }
+
+    const API_QUOTES = '/api/quotes';
+    const headerCard = document.getElementById('headerCard');
+    const linesBody = document.getElementById('linesBody');
+    const alertPlaceholder = document.getElementById('alertPlaceholder');
+    const btnPdf = document.getElementById('btnPdf');
+    let currentQuote = null;
+
+    function showAlert(message, type = 'danger') {
+      alertPlaceholder.innerHTML = '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>';
+    }
+
+    function escapeHtml(value) {
+      const div = document.createElement('div');
+      div.textContent = value || '';
+      return div.innerHTML;
+    }
+
+    function parseNumber(value, fallback = 0) {
+      const parsed = parseFloat(value);
+      return isNaN(parsed) ? fallback : parsed;
+    }
+
+    function formatMoney(value) {
+      return 'RD$ ' + parseNumber(value).toFixed(2);
+    }
+
+    function formatDate(value) {
+      if (!value) return '-';
+      const dt = new Date(value);
+      return isNaN(dt.getTime()) ? '-' : dt.toLocaleString('es-DO');
+    }
+
+    function getClientName(client) {
+      if (!client) return '-';
+      if (client.clientType === 'Company') return client.companyName || '-';
+      const fullName = ((client.firstName || '') + ' ' + (client.lastName || '')).trim();
+      return fullName || '-';
+    }
+
+    async function loadQuote() {
+      try {
+        const response = await fetch(API_QUOTES + '/' + quoteId);
+        if (!response.ok) throw new Error('No existe');
+        const quote = await response.json();
+        currentQuote = quote;
+
+        document.getElementById('linkEdit').href = 'edit.html?id=' + quote.id;
+
+        headerCard.querySelector('.card-body').innerHTML =
+          '<div class="row g-3">' +
+          '<div class="col-md-8">' +
+          '<h3 class="h5 mb-1">' + escapeHtml(quote.name || 'Sin nombre') + '</h3>' +
+          '<p class="text-muted mb-0">' + escapeHtml(quote.description || '-') + '</p>' +
+          '</div>' +
+          '<div class="col-md-4">' +
+          '<div><strong>Cliente:</strong> ' + escapeHtml(getClientName(quote.client)) + '</div>' +
+          '<div><strong>Creado:</strong> ' + formatDate(quote.createdAt) + '</div>' +
+          '<div><strong>Actualizado:</strong> ' + formatDate(quote.updatedAt) + '</div>' +
+          '</div>' +
+          '</div>';
+
+        if (!quote.lines || !quote.lines.length) {
+          linesBody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-4">No hay lineas en esta cotizacion.</td></tr>';
+          return;
+        }
+
+        let subtotal = 0;
+        let discount = 0;
+        let tax = 0;
+        let total = 0;
+
+        linesBody.innerHTML = quote.lines.map(line => {
+          subtotal += parseNumber(line.lineSubtotal);
+          discount += parseNumber(line.discountTotal);
+          tax += parseNumber(line.taxTotal);
+          total += parseNumber(line.lineTotal);
+
+          return '<tr>' +
+            '<td>' + escapeHtml(line.name || '-') + '</td>' +
+            '<td>' + escapeHtml(line.description || '-') + '</td>' +
+            '<td class="text-end">' + parseNumber(line.quantity).toFixed(2) + '</td>' +
+            '<td class="text-end">' + formatMoney(line.unitPrice) + '</td>' +
+            '<td class="text-end">' + parseNumber(line.discountValue).toFixed(2) + '%</td>' +
+            '<td class="text-end">' + (line.isTaxable ? parseNumber(line.taxRate).toFixed(2) + '%' : '0.00%') + '</td>' +
+            '<td class="text-end">' + formatMoney(line.lineSubtotal) + '</td>' +
+            '<td class="text-end">' + formatMoney(line.discountTotal) + '</td>' +
+            '<td class="text-end">' + formatMoney(line.taxTotal) + '</td>' +
+            '<td class="text-end fw-semibold">' + formatMoney(line.lineTotal) + '</td>' +
+            '</tr>';
+        }).join('');
+
+        document.getElementById('summarySubtotal').textContent = formatMoney(subtotal);
+        document.getElementById('summaryDiscount').textContent = formatMoney(discount);
+        document.getElementById('summaryTax').textContent = formatMoney(tax);
+        document.getElementById('summaryTotal').textContent = formatMoney(total);
+      } catch {
+        showAlert('No se pudo cargar la cotizacion.', 'danger');
+        headerCard.querySelector('.card-body').innerHTML = '<p class="text-danger mb-0">No se encontro la cotizacion.</p>';
+        linesBody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-4">Sin datos.</td></tr>';
+      }
+    }
+
+    btnPdf.addEventListener('click', async () => {
+      if (!currentQuote) {
+        showAlert('Aun no se ha cargado la cotizacion.', 'warning');
+        return;
+      }
+
+      try {
+        await window.QuotePdf.generateQuotePdf(currentQuote);
+      } catch {
+        showAlert('No se pudo generar el PDF.', 'danger');
+      }
+    });
+
+    loadQuote();
+  </script>
+</body>
+</html>

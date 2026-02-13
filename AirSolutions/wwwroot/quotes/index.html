@@ -1,0 +1,210 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cotizaciones - AirSolutions</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/site.css" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="/">AirSolutions</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="../clients/">Clientes</a></li>
+          <li class="nav-item"><a class="nav-link" href="../catalog-items/">Catalogo</a></li>
+          <li class="nav-item"><a class="nav-link active" href="index.html">Cotizaciones</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container my-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+      <h1 class="h2 mb-0">Cotizaciones</h1>
+      <a class="btn btn-primary" href="create.html">Nueva cotizacion</a>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <form id="formSearch" class="row g-2 align-items-end">
+          <div class="col-md-6">
+            <label class="form-label">Buscar</label>
+            <input type="text" class="form-control" id="search" placeholder="Nombre, descripcion o cliente...">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Cliente</label>
+            <select id="filterClient" class="form-select">
+              <option value="">Todos</option>
+            </select>
+          </div>
+          <div class="col-md-1">
+            <button type="submit" class="btn btn-outline-primary w-100">Buscar</button>
+          </div>
+          <div class="col-md-1">
+            <button type="button" class="btn btn-outline-secondary w-100" id="btnClear">Limpiar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="alertPlaceholder"></div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Cliente</th>
+            <th>Creado</th>
+            <th>Actualizado</th>
+            <th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td colspan="6" class="text-center text-muted">Cargando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+  <script src="../js/quote-pdf.js"></script>
+  <script>
+    const API_QUOTES = '/api/quotes';
+    const API_CLIENTS = '/api/clients';
+    const tbody = document.getElementById('tbody');
+    const formSearch = document.getElementById('formSearch');
+    const searchInput = document.getElementById('search');
+    const filterClient = document.getElementById('filterClient');
+    const btnClear = document.getElementById('btnClear');
+    const alertPlaceholder = document.getElementById('alertPlaceholder');
+
+    function showAlert(message, type = 'danger') {
+      alertPlaceholder.innerHTML = '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>';
+    }
+
+    function escapeHtml(value) {
+      const div = document.createElement('div');
+      div.textContent = value || '';
+      return div.innerHTML;
+    }
+
+    function formatDate(value) {
+      if (!value) return '-';
+      const dt = new Date(value);
+      return isNaN(dt.getTime()) ? '-' : dt.toLocaleString('es-DO');
+    }
+
+    function getClientName(client) {
+      if (!client) return '-';
+      if (client.clientType === 'Company') return client.companyName || '-';
+      const fullName = ((client.firstName || '') + ' ' + (client.lastName || '')).trim();
+      return fullName || '-';
+    }
+
+    async function loadClientsFilter() {
+      try {
+        const response = await fetch(API_CLIENTS + '?isActive=true');
+        if (!response.ok) throw new Error('No se pudo cargar clientes');
+        const clients = await response.json();
+        const options = clients.map(c => '<option value="' + c.id + '">' + escapeHtml(getClientName(c)) + '</option>').join('');
+        filterClient.innerHTML = '<option value="">Todos</option>' + options;
+      } catch {
+        filterClient.innerHTML = '<option value="">Todos</option>';
+      }
+    }
+
+    async function loadQuotes() {
+      const params = new URLSearchParams();
+      const search = searchInput.value.trim();
+      const clientId = filterClient.value;
+      if (search) params.set('search', search);
+      if (clientId) params.set('clientId', clientId);
+      const url = params.toString() ? API_QUOTES + '?' + params.toString() : API_QUOTES;
+
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center">Cargando...</td></tr>';
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('No se pudo cargar');
+        const rows = await response.json();
+
+        if (!rows.length) {
+          tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No hay cotizaciones.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = rows.map(q => {
+          return '<tr>' +
+            '<td>' + q.id + '</td>' +
+            '<td><div class="fw-semibold">' + escapeHtml(q.name || 'Sin nombre') + '</div><small class="text-muted">' + escapeHtml(q.description || '-') + '</small></td>' +
+            '<td>' + escapeHtml(getClientName(q.client)) + '</td>' +
+            '<td>' + formatDate(q.createdAt) + '</td>' +
+            '<td>' + formatDate(q.updatedAt) + '</td>' +
+            '<td class="text-end">' +
+            '<a class="btn btn-sm btn-outline-info me-1" href="view.html?id=' + q.id + '">Ver</a>' +
+            '<a class="btn btn-sm btn-outline-primary me-1" href="edit.html?id=' + q.id + '">Editar</a>' +
+            '<button type="button" class="btn btn-sm btn-outline-success me-1" data-action="pdf" data-id="' + q.id + '">PDF</button>' +
+            '<button type="button" class="btn btn-sm btn-outline-danger" data-action="delete" data-id="' + q.id + '" data-name="' + escapeHtml(q.name || 'Sin nombre') + '">Eliminar</button>' +
+            '</td>' +
+            '</tr>';
+        }).join('');
+
+        tbody.querySelectorAll('button[data-action="delete"]').forEach(btn => {
+          btn.addEventListener('click', () => deleteQuote(btn.dataset.id, btn.dataset.name));
+        });
+
+        tbody.querySelectorAll('button[data-action="pdf"]').forEach(btn => {
+          btn.addEventListener('click', () => downloadQuotePdf(btn.dataset.id));
+        });
+      } catch {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error al cargar la lista.</td></tr>';
+      }
+    }
+
+    async function downloadQuotePdf(id) {
+      try {
+        const response = await fetch(API_QUOTES + '/' + id);
+        if (!response.ok) throw new Error('No se pudo cargar la cotizacion');
+        const quote = await response.json();
+        await window.QuotePdf.generateQuotePdf(quote);
+      } catch {
+        showAlert('No se pudo descargar el PDF de la cotizacion.');
+      }
+    }
+
+    async function deleteQuote(id, name) {
+      if (!confirm('Eliminar la cotizacion "' + name + '"?')) return;
+      try {
+        const response = await fetch(API_QUOTES + '/' + id, { method: 'DELETE' });
+        if (!response.ok) throw new Error('No se pudo eliminar');
+        showAlert('Cotizacion eliminada.', 'success');
+        loadQuotes();
+      } catch {
+        showAlert('No se pudo eliminar la cotizacion.');
+      }
+    }
+
+    formSearch.addEventListener('submit', e => {
+      e.preventDefault();
+      loadQuotes();
+    });
+
+    btnClear.addEventListener('click', () => {
+      searchInput.value = '';
+      filterClient.value = '';
+      loadQuotes();
+    });
+
+    loadClientsFilter().then(loadQuotes);
+  </script>
+</body>
+</html>
