@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
@@ -7,24 +7,37 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="../css/site.css" rel="stylesheet">
 </head>
-<body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
-      <a class="navbar-brand" href="/">AirSolutions</a>
-      <div class="collapse navbar-collapse">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
-          <li class="nav-item"><a class="nav-link" href="../clients/">Clientes</a></li>
-          <li class="nav-item"><a class="nav-link active" href="index.html">Catálogo</a></li>
-          <li class="nav-item"><a class="nav-link" href="../quotes/">Cotizaciones</a></li>
-        </ul>
+<body class="landing-bizland module-page">
+  <header class="main-header sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <div class="container">
+        <a class="navbar-brand brand-mark" href="/">Air<span>Solutions</span></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+            <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+            <li class="nav-item"><a class="nav-link" href="../clients/">Clientes</a></li>
+            <li class="nav-item"><a class="nav-link active" href="../catalog-items/">Catalogo</a></li>
+            <li class="nav-item"><a class="nav-link" href="../quotes/">Cotizaciones</a></li>
+            <li class="nav-item">
+              <button id="openLoginBtn" type="button" class="btn btn-sm btn-outline-brand ms-lg-2">Iniciar sesion</button>
+            </li>
+            <li class="nav-item d-none" id="welcomeItem">
+              <span id="welcomeText" class="nav-link mb-0"></span>
+            </li>
+            <li class="nav-item d-none" id="logoutItem">
+              <button id="logoutBtn" type="button" class="btn btn-sm btn-outline-secondary">Cerrar sesion</button>
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
-  </nav>
-
-  <main class="container my-4">
+    </nav>
+  </header>
+<main class="container my-4">
     <div class="d-flex align-items-center gap-2 mb-4 flex-wrap">
-      <a class="btn btn-outline-secondary btn-sm" href="index.html">← Lista</a>
+      <a class="btn btn-outline-secondary btn-sm" href="index.html">â† Lista</a>
       <h1 class="h2 mb-0">Detalle del item</h1>
       <div class="ms-auto">
         <a class="btn btn-primary btn-sm" id="linkEdit">Editar</a>
@@ -40,6 +53,7 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/auth-ui.js"></script>
   <script>
     const API = '/api/catalogitems';
     const params = new URLSearchParams(location.search);
@@ -72,12 +86,12 @@
           '<tr><th class="text-muted">Tipo</th><td>' + (typeNames[data.itemType] || data.itemType || '-') + '</td></tr>' +
           (data.nivel ? '<tr><th class="text-muted">Nivel</th><td>' + data.nivel + '</td></tr>' : '') +
           '<tr><th class="text-muted">SKU</th><td>' + (data.sku || '-') + '</td></tr>' +
-          '<tr><th class="text-muted">Descripción</th><td>' + (data.description || '-') + '</td></tr>' +
+          '<tr><th class="text-muted">DescripciÃ³n</th><td>' + (data.description || '-') + '</td></tr>' +
           '<tr><th class="text-muted">Unidad</th><td>' + (data.unit || '-') + '</td></tr>' +
           '<tr><th class="text-muted">Precio base</th><td>' + (data.basePrice != null ? '$' + parseFloat(data.basePrice).toFixed(2) : '-') + '</td></tr>' +
           '<tr><th class="text-muted">Costo</th><td>' + (data.cost != null ? '$' + parseFloat(data.cost).toFixed(2) : '-') + '</td></tr>' +
-          '<tr><th class="text-muted">Gravable</th><td>' + (data.isTaxable ? 'Sí' : 'No') + '</td></tr>' +
-          '<tr><th class="text-muted">Activo</th><td>' + (data.isActive ? 'Sí' : 'No') + '</td></tr>' +
+          '<tr><th class="text-muted">Gravable</th><td>' + (data.isTaxable ? 'SÃ­' : 'No') + '</td></tr>' +
+          '<tr><th class="text-muted">Activo</th><td>' + (data.isActive ? 'SÃ­' : 'No') + '</td></tr>' +
           '<tr><th class="text-muted">Creado</th><td>' + formatDate(data.createdAt) + '</td></tr>' +
           '<tr><th class="text-muted">Actualizado</th><td>' + formatDate(data.updatedAt) + '</td></tr>' +
           '</table>';
@@ -88,3 +102,6 @@
   </script>
 </body>
 </html>
+
+
+

@@ -12,6 +12,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<CatalogItem> CatalogItems => Set<CatalogItem>();
     public DbSet<Quote> Quotes => Set<Quote>();
     public DbSet<QuoteLine> QuoteLines => Set<QuoteLine>();
+    public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -75,6 +76,19 @@ public class ApplicationDbContext : DbContext
                 .WithMany(q => q.Lines)
                 .HasForeignKey(l => l.QuoteId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<User>(e =>
+        {
+            e.HasKey(u => u.Id);
+            e.Property(u => u.Username).HasMaxLength(100).IsRequired();
+            e.Property(u => u.PasswordHash).HasMaxLength(255).IsRequired();
+            e.Property(u => u.FullName).HasMaxLength(200).IsRequired();
+            e.Property(u => u.Email).HasMaxLength(200);
+            e.Property(u => u.Role).HasMaxLength(50).IsRequired();
+            e.HasIndex(u => u.Username).IsUnique();
+            e.HasIndex(u => u.Email).IsUnique().HasFilter("[Email] IS NOT NULL");
+            e.HasIndex(u => u.IsActive);
         });
     }
 }

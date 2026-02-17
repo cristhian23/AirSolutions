@@ -7,22 +7,35 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="../css/site.css" rel="stylesheet">
 </head>
-<body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
-      <a class="navbar-brand" href="/">AirSolutions</a>
-      <div class="collapse navbar-collapse">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
-          <li class="nav-item"><a class="nav-link" href="../clients/">Clientes</a></li>
-          <li class="nav-item"><a class="nav-link" href="../catalog-items/">Catalogo</a></li>
-          <li class="nav-item"><a class="nav-link active" href="index.html">Cotizaciones</a></li>
-        </ul>
+<body class="landing-bizland module-page">
+  <header class="main-header sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <div class="container">
+        <a class="navbar-brand brand-mark" href="/">Air<span>Solutions</span></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+            <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+            <li class="nav-item"><a class="nav-link" href="../clients/">Clientes</a></li>
+            <li class="nav-item"><a class="nav-link" href="../catalog-items/">Catalogo</a></li>
+            <li class="nav-item"><a class="nav-link active" href="../quotes/">Cotizaciones</a></li>
+            <li class="nav-item">
+              <button id="openLoginBtn" type="button" class="btn btn-sm btn-outline-brand ms-lg-2">Iniciar sesion</button>
+            </li>
+            <li class="nav-item d-none" id="welcomeItem">
+              <span id="welcomeText" class="nav-link mb-0"></span>
+            </li>
+            <li class="nav-item d-none" id="logoutItem">
+              <button id="logoutBtn" type="button" class="btn btn-sm btn-outline-secondary">Cerrar sesion</button>
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
-  </nav>
-
-  <main class="container my-4">
+    </nav>
+  </header>
+<main class="container my-4">
     <div class="d-flex align-items-center gap-2 mb-4 flex-wrap">
       <a class="btn btn-outline-secondary btn-sm" href="index.html">Volver</a>
       <h1 class="h2 mb-0">Nueva cotizacion</h1>
@@ -227,6 +240,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/auth-ui.js"></script>
   <script>
     const API_QUOTES = '/api/quotes';
     const API_CLIENTS = '/api/clients';
@@ -238,6 +252,8 @@
       selectedClient: null,
       quotes: []
     };
+    const PREFILL_KEY = 'quote_prefill';
+    const MISSING_KEY = 'quote_missing_fields';
 
     const alertPlaceholder = document.getElementById('alertPlaceholder');
     const formQuote = document.getElementById('formQuote');
@@ -395,6 +411,100 @@
         taxRate: 0
       });
       renderLines();
+    }
+
+    async function applyAssistantPrefill() {
+      const raw = sessionStorage.getItem(PREFILL_KEY);
+      if (!raw) return;
+
+      let prefill = null;
+      try {
+        prefill = JSON.parse(raw);
+      } catch {
+        sessionStorage.removeItem(PREFILL_KEY);
+        sessionStorage.removeItem(MISSING_KEY);
+        return;
+      }
+
+      const serviceType = (prefill.serviceType || '').trim();
+      const workArea = (prefill.workArea || '').trim();
+      const materialsOrNotes = (prefill.materialsOrNotes || '').trim();
+      const clientName = (prefill.clientName || '').trim();
+      const clientId = prefill.clientId;
+      const phone = (prefill.phone || '').trim();
+      const address = (prefill.address || '').trim();
+      const quantity = prefill.quantity;
+      const unitPrice = prefill.unitPrice;
+      const catalogLines = Array.isArray(prefill.catalogLines) ? prefill.catalogLines : [];
+
+      if (serviceType && !document.getElementById('name').value.trim()) {
+        document.getElementById('name').value = 'Cotizacion de ' + serviceType;
+      }
+
+      const details = [];
+      if (serviceType) details.push('Servicio: ' + serviceType);
+      if (workArea) details.push('Area: ' + workArea);
+      if (materialsOrNotes) details.push('Notas: ' + materialsOrNotes);
+      if (phone) details.push('Telefono: ' + phone);
+      if (address) details.push('Direccion: ' + address);
+      if (quantity != null) details.push('Cantidad: ' + quantity);
+      if (unitPrice != null) details.push('Precio unitario: ' + unitPrice);
+
+      if (details.length) {
+        const current = document.getElementById('description').value.trim();
+        const generated = details.join(' | ');
+        document.getElementById('description').value = current ? (current + '\n' + generated) : generated;
+      }
+
+      if (clientId != null) {
+        try {
+          const response = await fetch(API_CLIENTS + '/' + clientId);
+          if (response.ok) {
+            const client = await response.json();
+            state.selectedClient = client;
+            clientSearch.value = getClientName(client);
+            renderClientSelection();
+          } else if (clientName && !clientSearch.value.trim()) {
+            clientSearch.value = clientName;
+          }
+        } catch {
+          if (clientName && !clientSearch.value.trim()) {
+            clientSearch.value = clientName;
+          }
+        }
+      } else if (clientName && !clientSearch.value.trim()) {
+        clientSearch.value = clientName;
+      }
+
+      if (catalogLines.length) {
+        catalogLines.forEach(line => {
+          state.lines.push({
+            name: line.name || '',
+            description: line.description || '',
+            quantity: parseNumber(line.quantity, 1),
+            unitPrice: parseNumber(line.unitPrice, 0),
+            discountValue: 0,
+            isTaxable: line.isTaxable === true,
+            taxRate: line.isTaxable === true ? parseNumber(line.taxRate, DEFAULT_TAX_RATE) : 0
+          });
+        });
+        renderLines();
+      }
+
+      let missingFields = [];
+      try {
+        missingFields = JSON.parse(sessionStorage.getItem(MISSING_KEY) || '[]');
+      } catch {
+        missingFields = [];
+      }
+
+      const missingLabel = Array.isArray(missingFields) && missingFields.length
+        ? '<br><strong>Faltantes:</strong> ' + missingFields.join(', ')
+        : '';
+      showAlert('Se aplicaron datos detectados por el asistente. Revisa y completa la informacion necesaria.' + missingLabel, 'info');
+
+      sessionStorage.removeItem(PREFILL_KEY);
+      sessionStorage.removeItem(MISSING_KEY);
     }
 
     async function searchClients(term) {
@@ -675,6 +785,10 @@
     renderClientSelection();
     renderLines();
     loadTemplateOptions();
+    applyAssistantPrefill();
   </script>
 </body>
 </html>
+
+
+

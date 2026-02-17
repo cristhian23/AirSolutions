@@ -7,25 +7,35 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="../css/site.css" rel="stylesheet">
 </head>
-<body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
-      <a class="navbar-brand" href="/">AirSolutions</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
-          <li class="nav-item"><a class="nav-link" href="../clients/">Clientes</a></li>
-          <li class="nav-item"><a class="nav-link" href="../catalog-items/">Catalogo</a></li>
-          <li class="nav-item"><a class="nav-link active" href="index.html">Cotizaciones</a></li>
-        </ul>
+<body class="landing-bizland module-page">
+  <header class="main-header sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <div class="container">
+        <a class="navbar-brand brand-mark" href="/">Air<span>Solutions</span></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+            <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+            <li class="nav-item"><a class="nav-link" href="../clients/">Clientes</a></li>
+            <li class="nav-item"><a class="nav-link" href="../catalog-items/">Catalogo</a></li>
+            <li class="nav-item"><a class="nav-link active" href="../quotes/">Cotizaciones</a></li>
+            <li class="nav-item">
+              <button id="openLoginBtn" type="button" class="btn btn-sm btn-outline-brand ms-lg-2">Iniciar sesion</button>
+            </li>
+            <li class="nav-item d-none" id="welcomeItem">
+              <span id="welcomeText" class="nav-link mb-0"></span>
+            </li>
+            <li class="nav-item d-none" id="logoutItem">
+              <button id="logoutBtn" type="button" class="btn btn-sm btn-outline-secondary">Cerrar sesion</button>
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
-  </nav>
-
-  <main class="container my-4">
+    </nav>
+  </header>
+<main class="container my-4">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
       <h1 class="h2 mb-0">Cotizaciones</h1>
       <a class="btn btn-primary" href="create.html">Nueva cotizacion</a>
@@ -75,6 +85,7 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/auth-ui.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
   <script src="../js/quote-pdf.js"></script>
@@ -208,3 +219,6 @@
   </script>
 </body>
 </html>
+
+
+

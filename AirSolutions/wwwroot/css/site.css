@@ -417,3 +417,111 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+.minimal-home {
+  background: radial-gradient(circle at top right, #eef5ff 0%, #f8fbff 36%, #ffffff 100%);
+}
+
+.minimal-home .main-header {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.minimal-home .minimal-main {
+  min-height: calc(100vh - 86px);
+  display: grid;
+  align-items: center;
+  padding: 2.5rem 0 3.5rem;
+}
+
+.minimal-home .assistant-shell {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.minimal-home .assistant-box {
+  background: #ffffff;
+  border: 1px solid #dfeaf9;
+  border-radius: 1.1rem;
+  box-shadow: 0 22px 50px rgba(15, 40, 79, 0.10);
+  padding: 2rem;
+}
+
+.minimal-home .assistant-box h1 {
+  font-size: clamp(1.6rem, 3.3vw, 2.25rem);
+  margin: 0;
+  font-weight: 800;
+  color: #12263f;
+}
+
+.minimal-home .assistant-box p {
+  margin: 0.6rem 0 1.3rem;
+  color: #5c6f8a;
+}
+
+.minimal-home .assistant-composer {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+}
+
+.minimal-home .assistant-composer input {
+  min-height: 56px;
+}
+
+.minimal-home .assistant-composer textarea {
+  min-height: 86px;
+  resize: none;
+}
+
+.minimal-home .assistant-result {
+  margin-top: 1rem;
+  min-height: 24px;
+  color: #475467;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 767.98px) {
+  .minimal-home .assistant-box {
+    padding: 1.25rem;
+  }
+
+  .minimal-home .assistant-composer {
+    grid-template-columns: 1fr;
+  }
+}
+
+.module-page {
+  background: radial-gradient(circle at top right, #eef5ff 0%, #f8fbff 36%, #ffffff 100%);
+  margin-bottom: 0;
+}
+
+.module-page .main-header {
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid #e6edf7;
+  backdrop-filter: blur(6px);
+}
+
+.module-page main.container {
+  padding-top: 1.25rem;
+  padding-bottom: 2rem;
+}
+
+.module-page .card {
+  border: 1px solid #e0eaf8;
+  border-radius: 0.9rem;
+  box-shadow: 0 10px 24px rgba(18, 45, 84, 0.06);
+}
+
+.module-page .table thead.table-light th {
+  background: #f4f8ff;
+}
+
+.module-page .btn-primary {
+  background: #106eea;
+  border-color: #106eea;
+}
+
+.module-page .btn-primary:hover {
+  background: #0a57bc;
+  border-color: #0a57bc;
+}
