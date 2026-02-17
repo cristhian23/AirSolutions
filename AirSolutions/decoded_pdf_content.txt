@@ -1,0 +1,135 @@
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+1 0 0 1 237.6378 675.8898 cm
+q
+120 0 0 120 0 0 cm
+/FormXob.1c87f25d2db28c5e029e73814dd6f500 Do
+Q
+Q
+q
+1 0 0 1 46 663.8898 cm
+Q
+q
+1 0 0 1 46 641.8898 cm
+q
+.105882 .368627 .662745 rg
+BT 1 0 0 1 0 4 Tm /F1 18 Tf 22 TL (COTIZACI\323N) Tj T* ET
+Q
+Q
+q
+1 0 0 1 46 613.8898 cm
+q
+.105882 .368627 .662745 rg
+BT 1 0 0 1 0 3 Tm /F2 11 Tf 14 TL (Air Solutions, R.D.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 46 593.8898 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 4 Tm /F1 10 Tf 14 TL (M\341s que aires, soluciones) Tj T* ET
+Q
+Q
+q
+1 0 0 1 46 581.8898 cm
+Q
+q
+1 0 0 1 46 567.8898 cm
+q
+BT 1 0 0 1 0 4 Tm 14 TL /F2 10 Tf 0 0 0 rg (Cliente:) Tj /F1 10 Tf ( Liliana Cabrera) Tj T* ET
+Q
+Q
+q
+1 0 0 1 46 553.8898 cm
+q
+BT 1 0 0 1 0 4 Tm 14 TL /F2 10 Tf 0 0 0 rg (Vendedor:) Tj /F1 10 Tf ( Cristhian Cuevas) Tj T* ET
+Q
+Q
+q
+1 0 0 1 46 539.8898 cm
+q
+BT 1 0 0 1 0 4 Tm 14 TL /F2 10 Tf 0 0 0 rg (Contacto:) Tj /F1 10 Tf ( 809-657-3428) Tj T* ET
+Q
+Q
+q
+1 0 0 1 46 525.8898 cm
+q
+BT 1 0 0 1 0 4 Tm 14 TL /F2 10 Tf 0 0 0 rg (Correo:) Tj /F1 10 Tf ( airsolutionsrd@gmail.com) Tj T* ET
+Q
+Q
+q
+1 0 0 1 46 511.8898 cm
+q
+BT 1 0 0 1 0 4 Tm 14 TL /F2 10 Tf 0 0 0 rg (Fecha:) Tj /F1 10 Tf ( 15/12/2025) Tj T* ET
+Q
+Q
+q
+1 0 0 1 46 491.8898 cm
+Q
+q
+1 0 0 1 47.6378 405.4898 cm
+q
+.105882 .368627 .662745 rg
+n 0 86.4 500 -18 re f*
+.960784 .960784 .960784 rg
+n 300 18 200 -18 re f*
+1 1 1 rg
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 6 73.4 Tm (Cantidad) Tj T* ET
+BT 1 0 0 1 76 73.4 Tm (Descripci\363n) Tj T* ET
+BT 1 0 0 1 306 73.4 Tm (Precio Unitario) Tj T* ET
+BT 1 0 0 1 406 73.4 Tm (Total) Tj T* ET
+0 0 0 rg
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 6 56.4 Tm (1) Tj T* ET
+BT 1 0 0 1 76 56.4 Tm (Servicios de instalaci\363n aire 12K BTU en tercer nivel) Tj T* ET
+BT 1 0 0 1 340.972 56.4 Tm (RD$3,500.00) Tj T* ET
+BT 1 0 0 1 440.972 56.4 Tm (RD$3,500.00) Tj T* ET
+BT 1 0 0 1 6 39.6 Tm (1) Tj T* ET
+BT 1 0 0 1 76 39.6 Tm (Instalaci\363n de palometas) Tj T* ET
+BT 1 0 0 1 348.478 39.6 Tm (RD$500.00) Tj T* ET
+BT 1 0 0 1 448.478 39.6 Tm (RD$500.00) Tj T* ET
+BT 1 0 0 1 6 22.8 Tm (1) Tj T* ET
+BT 1 0 0 1 76 22.8 Tm (Palometas) Tj T* ET
+BT 1 0 0 1 348.478 22.8 Tm (RD$500.00) Tj T* ET
+BT 1 0 0 1 440.972 22.8 Tm (RD$1,000.00) Tj T* ET
+BT 1 0 0 1 6 5.4 Tm  T* ET
+BT 1 0 0 1 76 5.4 Tm  T* ET
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 330.09 5 Tm (Total General) Tj T* ET
+BT 1 0 0 1 435.08 5 Tm (RD$5,000.00) Tj T* ET
+q
+1 J
+1 j
+.827451 .827451 .827451 RG
+.5 w
+n 0 86.4 m 500 86.4 l S
+n 0 18 m 500 18 l S
+n 0 18 m 0 86.4 l S
+n 500 18 m 500 86.4 l S
+n 0 68.4 m 500 68.4 l S
+n 0 51.6 m 500 51.6 l S
+n 0 34.8 m 500 34.8 l S
+n 70 18 m 70 86.4 l S
+n 300 18 m 300 86.4 l S
+n 400 18 m 400 86.4 l S
+Q
+Q
+Q
+q
+1 0 0 1 46 385.4898 cm
+Q
+q
+1 0 0 1 46 371.4898 cm
+q
+.105882 .368627 .662745 rg
+BT 1 0 0 1 0 3 Tm /F2 11 Tf 14 TL (Notas:) Tj T* ET
+Q
+Q
+q
+1 0 0 1 46 337.4898 cm
+q
+BT 1 0 0 1 0 18 Tm 14 TL /F1 10 Tf 0 0 0 rg (\177 Esta cotizaci\363n es v\341lida por 7 d\355as.) Tj  T* (\177 Precios incluyen transporte.) Tj T* ET
+Q
+Q
+ 

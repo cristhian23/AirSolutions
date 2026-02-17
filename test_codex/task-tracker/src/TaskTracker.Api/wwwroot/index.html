@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>task-tracker</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <h4>Task Tracker</h4>
+
+    <div id="alert" class="card-panel red lighten-4 red-text text-darken-4 hide"></div>
+
+    <section class="card-panel">
+      <h6 id="formTitle">Create task</h6>
+      <form id="taskForm" class="row">
+        <input type="hidden" id="taskId" />
+        <div class="input-field col s12 m6">
+          <input id="title" type="text" maxlength="80" required />
+          <label for="title">Title</label>
+        </div>
+        <div class="input-field col s12 m6">
+          <input id="dueDate" type="date" />
+          <label for="dueDate" class="active">Due date</label>
+        </div>
+        <div class="input-field col s12">
+          <textarea id="description" class="materialize-textarea" maxlength="500"></textarea>
+          <label for="description">Description</label>
+        </div>
+        <div class="input-field col s12 m4">
+          <select id="priority">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
+          <label>Priority</label>
+        </div>
+        <div class="input-field col s12 m4">
+          <select id="status">
+            <option value="todo" selected>Todo</option>
+            <option value="doing">Doing</option>
+            <option value="done">Done</option>
+          </select>
+          <label>Status</label>
+        </div>
+        <div class="col s12 m4 actions">
+          <button class="btn waves-effect waves-light" type="submit" id="saveBtn">Save</button>
+          <button class="btn-flat" type="button" id="cancelEdit">Cancel</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card-panel filters row">
+      <div class="input-field col s12 m4">
+        <input id="search" type="text" />
+        <label for="search">Search</label>
+      </div>
+      <div class="input-field col s6 m2">
+        <select id="filterStatus">
+          <option value="">All</option>
+          <option value="todo">Todo</option>
+          <option value="doing">Doing</option>
+          <option value="done">Done</option>
+        </select>
+        <label>Status</label>
+      </div>
+      <div class="input-field col s6 m2">
+        <select id="filterPriority">
+          <option value="">All</option>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+        <label>Priority</label>
+      </div>
+      <div class="input-field col s6 m2">
+        <select id="sort">
+          <option value="createdAt" selected>Created</option>
+          <option value="dueDate">Due date</option>
+          <option value="priority">Priority</option>
+        </select>
+        <label>Sort</label>
+      </div>
+      <div class="input-field col s6 m2">
+        <select id="order">
+          <option value="desc" selected>Desc</option>
+          <option value="asc">Asc</option>
+        </select>
+        <label>Order</label>
+      </div>
+    </section>
+
+    <ul id="taskList" class="collection"></ul>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script src="app.js" type="module"></script>
+</body>
+</html>

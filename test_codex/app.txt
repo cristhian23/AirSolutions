@@ -1,0 +1,118 @@
+QUIERO QUE GENERES UN PROYECTO COMPLETO FULL-STACK (backend + frontend) LLAMADO "task-tracker".
+
+OBJETIVO
+Una app para gestionar tareas (CRUD) con:
+- Backend Node.js + Express
+- Base de datos SQLite (archivo local)
+- Frontend HTML/CSS/JS (usa Materialize) servido por el propio backend
+- Tests automatizados del API
+- README con instrucciones claras
+
+REQUISITOS FUNCIONALES
+1) Tareas: crear, listar, ver detalle, editar, marcar completa/incompleta, eliminar.
+2) Campos de Task:
+   - id (autoincrement)
+   - title (string, requerido, 3..80)
+   - description (string, opcional, max 500)
+   - priority (enum: low|medium|high, default medium)
+   - status (enum: todo|doing|done, default todo)
+   - dueDate (YYYY-MM-DD, opcional)
+   - createdAt (ISO string)
+   - updatedAt (ISO string)
+3) Listado debe soportar filtros y orden:
+   - query params: status, priority, search (busca en title/description), sort (createdAt|dueDate|priority), order (asc|desc)
+4) Validaciones:
+   - title requerido y largo válido
+   - priority/status solo valores permitidos
+   - dueDate si viene debe ser fecha válida YYYY-MM-DD
+   - responder 400 con errores claros y consistentes (JSON)
+
+REQUISITOS DE API (REST)
+- GET    /api/tasks              -> lista con filtros
+- GET    /api/tasks/:id          -> detalle
+- POST   /api/tasks              -> crea
+- PUT    /api/tasks/:id          -> reemplaza/actualiza
+- PATCH  /api/tasks/:id/status   -> actualiza solo status (y done)
+- DELETE /api/tasks/:id          -> elimina
+
+Respuestas JSON consistentes:
+{
+  "ok": true|false,
+  "data": ...,
+  "error": { "message": "...", "details": [...] }
+}
+
+BASE DE DATOS (SQLite)
+- Guardar en ./data/app.db
+- Crear tabla tasks si no existe al iniciar
+- Usar una capa de acceso a datos (archivo separado) con funciones:
+  createTask, getTaskById, listTasks, updateTask, updateStatus, deleteTask
+- Evitar SQL injection usando parámetros
+
+FRONTEND (Materialize)
+- Página principal / con:
+  - Formulario para crear/editar tarea
+  - Lista de tareas con:
+    - buscador (search)
+    - filtros (status, priority)
+    - selector de orden
+    - botones: editar, eliminar, marcar done/toggle
+  - Vista detalle (puede ser modal o sección)
+- UI simple pero limpia (CSS propio), responsive básico
+- Consumir API con fetch
+- Manejar errores mostrando mensajes en pantalla
+
+CALIDAD Y ESTRUCTURA
+- Usar JavaScript moderno (ESM) y Node >= 18
+- Estructura sugerida:
+  /src
+    server.js
+    db.js
+    routes/tasks.routes.js
+    validators.js
+  /public
+    index.html
+    styles.css
+    app.js
+  /data (se crea)
+  /tests
+    tasks.api.test.js
+  package.json
+  README.md
+- Agregar logging básico de requests (morgan o middleware simple)
+
+TESTS
+- Usar Vitest o Jest + Supertest
+- Cubrir al menos:
+  - POST crea ok
+  - validación title falla
+  - GET lista con filtros funciona
+  - PATCH status cambia
+  - DELETE elimina
+
+SCRIPTS
+package.json con:
+- "dev": iniciar server con nodemon
+- "start": node src/server.js
+- "test": correr tests
+- "db:reset": borrar ./data/app.db (si existe) para empezar limpio
+
+README
+Debe incluir:
+- Requisitos (Node)
+- Instalación
+- Ejecutar (dev/start)
+- Ejecutar tests
+- Ejemplos de endpoints (curl)
+- Notas de diseño
+
+ENTREGABLE
+Devuélveme:
+1) El árbol de archivos final
+2) El contenido COMPLETO de cada archivo
+3) Instrucciones para ejecutar paso a paso en Windows (PowerShell)
+
+IMPORTANTE
+- No uses TypeScript
+- No uses React/Vue/etc
+- Todo debe correr local con npm install && npm run dev

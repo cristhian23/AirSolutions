@@ -1,0 +1,59 @@
+:root {
+  --bg: #f2f5f7;
+  --surface: #ffffff;
+  --text: #202124;
+  --muted: #5f6368;
+}
+
+body {
+  background: linear-gradient(150deg, #ecf4ff 0%, #f7fbff 45%, #fef8f1 100%);
+  color: var(--text);
+}
+
+main.container {
+  max-width: 960px;
+  padding-top: 1.5rem;
+  padding-bottom: 2rem;
+}
+
+.card-panel {
+  background: var(--surface);
+  border-radius: 12px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.filters {
+  margin-top: 1rem;
+}
+
+.collection .secondary-content button {
+  margin-left: 0.5rem;
+}
+
+.task-meta {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 0.25rem;
+}
+
+.badge-status {
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.75rem;
+  margin-right: 0.4rem;
+  color: #fff;
+}
+
+.status-todo { background-color: #1e88e5; }
+.status-doing { background-color: #f9a825; }
+.status-done { background-color: #2e7d32; }
+
+.hide {
+  display: none;
+}
