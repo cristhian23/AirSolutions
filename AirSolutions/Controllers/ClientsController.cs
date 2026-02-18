@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using AirSolutions.Data;
 using AirSolutions.Models;
@@ -7,6 +8,7 @@ namespace AirSolutions.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class ClientsController : ControllerBase
 {
     private readonly ApplicationDbContext _db;
@@ -52,6 +54,7 @@ public class ClientsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<Client>> CreateClient([FromBody] Client model, CancellationToken cancellationToken = default)
     {
         var errors = ValidateClient(model, isNew: true);
@@ -67,6 +70,7 @@ public class ClientsController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<Client>> UpdateClient(int id, [FromBody] Client model, CancellationToken cancellationToken = default)
     {
         if (id != model.Id) return BadRequest();
@@ -97,6 +101,7 @@ public class ClientsController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteClient(int id, CancellationToken cancellationToken = default)
     {
         var client = await _db.Clients.FindAsync([id], cancellationToken);

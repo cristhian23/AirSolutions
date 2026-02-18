@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
   const BLUE = [27, 94, 169];
   const LIGHT_GRAY = [245, 245, 245];
   const BORDER_GRAY = [211, 211, 211];
@@ -148,7 +148,7 @@
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
     doc.text('Cantidad', x + 6, y + 12);
-    doc.text('Descripcion', x + colWidths[0] + 6, y + 12);
+    doc.text('Descripción', x + colWidths[0] + 6, y + 12);
     doc.text('Precio Unitario', x + colWidths[0] + colWidths[1] + 6, y + 12);
     doc.text('Total', x + colWidths[0] + colWidths[1] + colWidths[2] + 6, y + 12);
 
@@ -213,7 +213,7 @@
     doc.setTextColor(0, 0, 0);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
-    doc.text('- Esta cotizacion es valida por 7 dias.', 46, startY + 17);
+    doc.text('- Esta cotización es válida por 7 días.', 46, startY + 17);
     doc.text('- Precios incluyen transporte.', 46, startY + 31);
   }
 
@@ -230,12 +230,12 @@
     const tableBottom = drawQuoteTable(doc, quote);
     drawNotes(doc, tableBottom + 28);
 
-    const safeName = (quote.name || 'cotizacion')
+    const safeName = (quote.name || 'cotización')
       .replace(/[^a-z0-9_-]+/gi, '_')
       .toLowerCase();
 
     const fileName = (options && options.fileName)
-      || ('cotizacion_' + (quote.id || 'sin_id') + '_' + safeName + '.pdf');
+      || ('cotización_' + (quote.id || 'sin_id') + '_' + safeName + '.pdf');
 
     doc.save(fileName);
   }
@@ -244,3 +244,4 @@
     generateQuotePdf
   };
 })();
+

@@ -19,16 +19,16 @@
           <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
             <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
             <li class="nav-item"><a class="nav-link active" href="../clients/">Clientes</a></li>
-            <li class="nav-item"><a class="nav-link" href="../catalog-items/">Catalogo</a></li>
-            <li class="nav-item"><a class="nav-link" href="../quotes/">Cotizaciones</a></li>
+            <li class="nav-item"><a class="nav-link" href="../catalog-items/">Catálogo</a></li>
+            <li class="nav-item"><a class="nav-link" href="../quotes/">Cotizaciónes</a></li>
             <li class="nav-item">
-              <button id="openLoginBtn" type="button" class="btn btn-sm btn-outline-brand ms-lg-2">Iniciar sesion</button>
+              <button id="openLoginBtn" type="button" class="btn btn-sm btn-outline-brand ms-lg-2">Iniciar sesión</button>
             </li>
             <li class="nav-item d-none" id="welcomeItem">
               <span id="welcomeText" class="nav-link mb-0"></span>
             </li>
             <li class="nav-item d-none" id="logoutItem">
-              <button id="logoutBtn" type="button" class="btn btn-sm btn-outline-secondary">Cerrar sesion</button>
+              <button id="logoutBtn" type="button" class="btn btn-sm btn-outline-secondary">Cerrar sesión</button>
             </li>
           </ul>
         </div>
@@ -46,7 +46,7 @@
         <form id="formSearch" class="row g-2">
           <div class="col-md-5">
             <label class="form-label visually-hidden">Buscar</label>
-            <input type="text" class="form-control" id="search" name="search" placeholder="Nombre o telÃ©fono...">
+            <input type="text" class="form-control" id="search" name="search" placeholder="Nombre o teléfono...">
           </div>
           <div class="col-md-3">
             <label class="form-label visually-hidden">Estado</label>
@@ -74,10 +74,10 @@
             <th>Id</th>
             <th>Tipo</th>
             <th>Nombre / Empresa</th>
-            <th>TelÃ©fono</th>
+            <th>Teléfono</th>
             <th>Email</th>
             <th>Activo</th>
-            <th class="text-end">Acciones</th>
+            <th class="text-end">Acciónes</th>
           </tr>
         </thead>
         <tbody id="tbody">
@@ -112,7 +112,11 @@
 
       tbody.innerHTML = '<tr><td colspan="7" class="text-center">Cargando...</td></tr>';
       fetch(url)
-        .then(r => { if (!r.ok) throw new Error('Error al cargar'); return r.json(); })
+        .then(r => {
+          if (r.status === 401) throw new Error('AUTH_REQUIRED');
+          if (!r.ok) throw new Error('LOAD_ERROR');
+          return r.json();
+        })
         .then(data => {
           if (data.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No hay clientes.</td></tr>';
@@ -126,7 +130,7 @@
               '<td>' + escapeHtml(name) + '</td>' +
               '<td>' + escapeHtml(c.phone || '') + '</td>' +
               '<td>' + escapeHtml(c.email || '-') + '</td>' +
-              '<td>' + (c.isActive ? '<span class="badge bg-success">SÃ­</span>' : '<span class="badge bg-secondary">No</span>') + '</td>' +
+              '<td>' + (c.isActive ? '<span class="badge bg-success">Sí</span>' : '<span class="badge bg-secondary">No</span>') + '</td>' +
               '<td class="text-end"><a class="btn btn-sm btn-outline-info me-1" href="view.html?id=' + c.id + '">Ver</a><a class="btn btn-sm btn-outline-primary me-1" href="edit.html?id=' + c.id + '">Editar</a><button type="button" class="btn btn-sm btn-outline-danger" data-id="' + c.id + '" data-name="' + escapeHtml(name) + '">Eliminar</button></td>' +
               '</tr>';
           }).join('');
@@ -134,7 +138,14 @@
             btn.addEventListener('click', () => deleteClient(btn.dataset.id, btn.dataset.name));
           });
         })
-        .catch(() => { tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error al cargar la lista.</td></tr>'; });
+        .catch((err) => {
+          if (err && err.message === 'AUTH_REQUIRED') {
+            showAlert('Debes iniciar sesión para ver esta información.', 'warning');
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Inicia sesión para mostrar la lista.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error al cargar la lista.</td></tr>';
+        });
     }
 
     function escapeHtml(s) {
@@ -144,7 +155,7 @@
     }
 
     function deleteClient(id, name) {
-      if (!confirm('Â¿Eliminar el cliente "' + name + '"?')) return;
+      if (!confirm('¿Eliminar el cliente "' + name + '"?')) return;
       fetch(API + '/' + id, { method: 'DELETE' })
         .then(r => { if (!r.ok) throw new Error(); loadClients(); showAlert('Cliente eliminado.', 'success'); })
         .catch(() => showAlert('No se pudo eliminar.'));
@@ -156,6 +167,9 @@
   </script>
 </body>
 </html>
+
+
+
 
 
 

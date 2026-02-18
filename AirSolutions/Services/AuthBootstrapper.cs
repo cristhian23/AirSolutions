@@ -61,8 +61,13 @@ public class AuthBootstrapper
 
         var seedPasswordFromEnv = Environment.GetEnvironmentVariable("AUTH_SEED_ADMIN_PASSWORD");
         var password = string.IsNullOrWhiteSpace(seedPasswordFromEnv)
-            ? (_settings.SeedAdminPassword ?? "Admin123!")
+            ? (_settings.SeedAdminPassword ?? "")
             : seedPasswordFromEnv.Trim();
+
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            throw new InvalidOperationException("No hay password de seed para usuario admin. Define AUTH_SEED_ADMIN_PASSWORD o AuthBootstrap:SeedAdminPassword.");
+        }
 
         user.PasswordHash = _passwordHasher.HashPassword(user, password);
         _db.Users.Add(user);

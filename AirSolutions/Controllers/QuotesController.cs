@@ -1,4 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using AirSolutions.Data;
 using AirSolutions.Models;
@@ -7,6 +8,7 @@ namespace AirSolutions.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class QuotesController : ControllerBase
 {
     private readonly ApplicationDbContext _db;
@@ -152,6 +154,7 @@ public class QuotesController : ControllerBase
 
     /// <summary>Crea una cotización nueva (desde cero o desde plantilla).</summary>
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<object>> CreateQuote([FromBody] QuoteCreateRequest request, CancellationToken cancellationToken = default)
     {
         var errors = new List<string>();
@@ -199,7 +202,7 @@ public class QuotesController : ControllerBase
             CreatedAt = DateTime.UtcNow
         };
 
-        // Si viene plantilla, podemos copiar campos por defecto (nombre/descripcion/lineas) y luego aplicar overrides
+        // Si viene plantilla, podemos copiar campos por defecto (nombre/descripción/líneas) y luego aplicar overrides
         if (request.FromQuoteId.HasValue)
         {
             var baseQuote = await _db.Quotes
@@ -261,6 +264,7 @@ public class QuotesController : ControllerBase
 
     /// <summary>Actualiza una cotización (cabecera + líneas).</summary>
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<object>> UpdateQuote(int id, [FromBody] QuoteCreateRequest request, CancellationToken cancellationToken = default)
     {
         var quote = await _db.Quotes
@@ -317,6 +321,7 @@ public class QuotesController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteQuote(int id, CancellationToken cancellationToken = default)
     {
         var quote = await _db.Quotes
@@ -387,4 +392,5 @@ public class QuotesController : ControllerBase
         };
     }
 }
+
 

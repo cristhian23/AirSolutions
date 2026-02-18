@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nueva cotizacion - AirSolutions</title>
+  <title>Nueva cotización - AirSolutions</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="../css/site.css" rel="stylesheet">
 </head>
@@ -19,16 +19,16 @@
           <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
             <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
             <li class="nav-item"><a class="nav-link" href="../clients/">Clientes</a></li>
-            <li class="nav-item"><a class="nav-link" href="../catalog-items/">Catalogo</a></li>
-            <li class="nav-item"><a class="nav-link active" href="../quotes/">Cotizaciones</a></li>
+            <li class="nav-item"><a class="nav-link" href="../catalog-items/">Catálogo</a></li>
+            <li class="nav-item"><a class="nav-link active" href="../quotes/">Cotizaciónes</a></li>
             <li class="nav-item">
-              <button id="openLoginBtn" type="button" class="btn btn-sm btn-outline-brand ms-lg-2">Iniciar sesion</button>
+              <button id="openLoginBtn" type="button" class="btn btn-sm btn-outline-brand ms-lg-2">Iniciar sesión</button>
             </li>
             <li class="nav-item d-none" id="welcomeItem">
               <span id="welcomeText" class="nav-link mb-0"></span>
             </li>
             <li class="nav-item d-none" id="logoutItem">
-              <button id="logoutBtn" type="button" class="btn btn-sm btn-outline-secondary">Cerrar sesion</button>
+              <button id="logoutBtn" type="button" class="btn btn-sm btn-outline-secondary">Cerrar sesión</button>
             </li>
           </ul>
         </div>
@@ -38,7 +38,7 @@
 <main class="container my-4">
     <div class="d-flex align-items-center gap-2 mb-4 flex-wrap">
       <a class="btn btn-outline-secondary btn-sm" href="index.html">Volver</a>
-      <h1 class="h2 mb-0">Nueva cotizacion</h1>
+      <h1 class="h2 mb-0">Nueva cotización</h1>
     </div>
 
     <div id="alertPlaceholder"></div>
@@ -49,7 +49,7 @@
           <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label">Nombre</label>
-              <input type="text" class="form-control" id="name" maxlength="300" placeholder="Ej: Cotizacion AA-001">
+              <input type="text" class="form-control" id="name" maxlength="300" placeholder="Ej: Cotización AA-001">
             </div>
             <div class="col-md-6">
               <label class="form-label">Crear desde plantilla</label>
@@ -59,10 +59,10 @@
                 </select>
                 <button class="btn btn-outline-secondary" type="button" id="btnApplyTemplate">Cargar</button>
               </div>
-              <div class="form-text">Copia nombre, descripcion y lineas de una cotizacion existente.</div>
+              <div class="form-text">Copia nombre, descripción y líneas de una cotización existente.</div>
             </div>
             <div class="col-12">
-              <label class="form-label">Descripcion</label>
+              <label class="form-label">Descripción</label>
               <textarea class="form-control" id="description" rows="2" maxlength="1000"></textarea>
             </div>
           </div>
@@ -79,7 +79,7 @@
           <div class="row g-2">
             <div class="col-md-8 position-relative">
               <label class="form-label">Buscar cliente</label>
-              <input type="text" class="form-control" id="clientSearch" placeholder="Nombre, empresa o telefono..." autocomplete="off">
+              <input type="text" class="form-control" id="clientSearch" placeholder="Nombre, empresa o teléfono..." autocomplete="off">
               <div id="clientResults" class="list-group position-absolute w-100 shadow-sm" style="z-index: 1050;"></div>
             </div>
             <div class="col-md-4 d-flex align-items-end">
@@ -92,10 +92,10 @@
 
       <div class="card mb-3">
         <div class="card-header bg-light d-flex justify-content-between align-items-center flex-wrap gap-2">
-          <span class="fw-semibold">Lineas de cotizacion</span>
+          <span class="fw-semibold">Líneas de cotización</span>
           <div class="d-flex gap-2">
-            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnAddLine">Agregar linea manual</button>
-            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalCatalog">Agregar linea desde catalogo</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnAddLine">Agregar línea manual</button>
+            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalCatalog">Agregar línea desde catálogo</button>
           </div>
         </div>
         <div class="card-body">
@@ -104,18 +104,18 @@
               <thead class="table-light">
                 <tr>
                   <th style="min-width: 180px;">Nombre</th>
-                  <th style="min-width: 220px;">Descripcion</th>
+                  <th style="min-width: 220px;">Descripción</th>
                   <th style="width: 110px;">Cantidad</th>
                   <th style="width: 140px;">Precio unitario</th>
                   <th style="width: 120px;">Desc %</th>
                   <th style="width: 90px;">ITBIS</th>
                   <th style="width: 120px;">ITBIS %</th>
-                  <th style="width: 130px;">Total linea</th>
+                  <th style="width: 130px;">Total línea</th>
                   <th style="width: 80px;"></th>
                 </tr>
               </thead>
               <tbody id="linesBody">
-                <tr><td colspan="9" class="text-center text-muted">Aun no hay lineas.</td></tr>
+                <tr><td colspan="9" class="text-center text-muted">Aún no hay líneas.</td></tr>
               </tbody>
             </table>
           </div>
@@ -134,7 +134,7 @@
       </div>
 
       <div class="d-flex gap-2">
-        <button type="submit" class="btn btn-primary">Guardar cotizacion</button>
+        <button type="submit" class="btn btn-primary">Guardar cotización</button>
         <a class="btn btn-outline-secondary" href="index.html">Cancelar</a>
       </div>
     </form>
@@ -170,7 +170,7 @@
                 <input type="text" class="form-control" name="lastName" maxlength="200">
               </div>
               <div class="col-md-6">
-                <label class="form-label">Telefono</label>
+                <label class="form-label">Teléfono</label>
                 <input type="text" class="form-control" name="phone" required maxlength="50">
               </div>
               <div class="col-md-6">
@@ -192,13 +192,13 @@
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header">
-          <h2 class="modal-title fs-5">Agregar linea desde catalogo</h2>
+          <h2 class="modal-title fs-5">Agregar línea desde catálogo</h2>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
           <div class="row g-2 mb-3">
             <div class="col-md-6">
-              <input type="text" class="form-control" id="catalogSearch" placeholder="Buscar por nombre, descripcion o SKU...">
+              <input type="text" class="form-control" id="catalogSearch" placeholder="Buscar por nombre, descripción o SKU...">
             </div>
             <div class="col-md-3">
               <select class="form-select" id="catalogType">
@@ -223,7 +223,7 @@
                   <th>SKU</th>
                   <th>Precio base</th>
                   <th>ITBIS</th>
-                  <th class="text-end">Accion</th>
+                  <th class="text-end">Acción</th>
                 </tr>
               </thead>
               <tbody id="catalogBody">
@@ -317,7 +317,7 @@
 
     function renderLines() {
       if (!state.lines.length) {
-        linesBody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">Aun no hay lineas.</td></tr>';
+        linesBody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">Aún no hay líneas.</td></tr>';
         renderSummary();
         return;
       }
@@ -438,15 +438,15 @@
       const catalogLines = Array.isArray(prefill.catalogLines) ? prefill.catalogLines : [];
 
       if (serviceType && !document.getElementById('name').value.trim()) {
-        document.getElementById('name').value = 'Cotizacion de ' + serviceType;
+        document.getElementById('name').value = 'Cotización de ' + serviceType;
       }
 
       const details = [];
       if (serviceType) details.push('Servicio: ' + serviceType);
       if (workArea) details.push('Area: ' + workArea);
       if (materialsOrNotes) details.push('Notas: ' + materialsOrNotes);
-      if (phone) details.push('Telefono: ' + phone);
-      if (address) details.push('Direccion: ' + address);
+      if (phone) details.push('Teléfono: ' + phone);
+      if (address) details.push('Dirección: ' + address);
       if (quantity != null) details.push('Cantidad: ' + quantity);
       if (unitPrice != null) details.push('Precio unitario: ' + unitPrice);
 
@@ -533,7 +533,7 @@
         return;
       }
 
-      const shouldReplace = !state.lines.length || confirm('Esto reemplazara las lineas actuales. Deseas continuar?');
+      const shouldReplace = !state.lines.length || confirm('Esto reemplazara las líneas actuales. Deseas continuar?');
       if (!shouldReplace) return;
 
       try {
@@ -558,20 +558,20 @@
       }
     }
 
-    function validateBeforeSubmit() {
+    function válidateBeforeSubmit() {
       if (!state.selectedClient || !state.selectedClient.id) {
         showAlert('Debes seleccionar un cliente.');
         return false;
       }
 
       if (!state.lines.length) {
-        showAlert('Debes agregar al menos una linea.');
+        showAlert('Debes agregar al menos una línea.');
         return false;
       }
 
       const invalidLine = state.lines.find(line => !line.name || parseNumber(line.quantity) <= 0 || parseNumber(line.unitPrice) < 0 || parseNumber(line.discountValue) < 0 || parseNumber(line.discountValue) > 100 || parseNumber(line.taxRate) < 0 || parseNumber(line.taxRate) > 100);
       if (invalidLine) {
-        showAlert('Revisa las lineas: nombre, cantidad, precio, descuento e ITBIS deben ser validos.');
+        showAlert('Revisa las líneas: nombre, cantidad, precio, descuento e ITBIS deben ser validos.');
         return false;
       }
 
@@ -609,7 +609,7 @@
 
       try {
         const response = await fetch(API_CATALOG + '?' + params.toString());
-        if (!response.ok) throw new Error('No se pudo cargar catalogo');
+        if (!response.ok) throw new Error('No se pudo cargar catálogo');
         const items = await response.json();
 
         if (!items.length) {
@@ -638,7 +638,7 @@
           });
         });
       } catch {
-        catalogBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error al cargar catalogo.</td></tr>';
+        catalogBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error al cargar catálogo.</td></tr>';
       }
     }
 
@@ -751,7 +751,7 @@
         newClientModal.hide();
         showAlert('Cliente creado y seleccionado.', 'success');
       } catch {
-        showAlert('Error de conexion al crear el cliente.');
+        showAlert('Error de conexión al crear el cliente.');
       }
     });
 
@@ -769,16 +769,16 @@
 
         const result = await response.json();
         if (!response.ok) {
-          showAlert((result.errors && result.errors.join('<br>')) || 'No se pudo guardar la cotizacion.');
+          showAlert((result.errors && result.errors.join('<br>')) || 'No se pudo guardar la cotización.');
           return;
         }
 
-        showAlert('Cotizacion creada correctamente.', 'success');
+        showAlert('Cotización creada correctamente.', 'success');
         setTimeout(() => {
           location.href = 'view.html?id=' + result.id;
         }, 900);
       } catch {
-        showAlert('Error de conexion al guardar la cotizacion.');
+        showAlert('Error de conexión al guardar la cotización.');
       }
     });
 
@@ -789,6 +789,7 @@
   </script>
 </body>
 </html>
+
 
 
 

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using AirSolutions.Data;
 using AirSolutions.Models;
@@ -7,6 +8,7 @@ namespace AirSolutions.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class CatalogItemsController : ControllerBase
 {
     private readonly ApplicationDbContext _db;
@@ -54,6 +56,7 @@ public class CatalogItemsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<CatalogItem>> CreateCatalogItem([FromBody] CatalogItem model, CancellationToken cancellationToken = default)
     {
         var errors = ValidateCatalogItem(model, isNew: true);
@@ -69,6 +72,7 @@ public class CatalogItemsController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<CatalogItem>> UpdateCatalogItem(int id, [FromBody] CatalogItem model, CancellationToken cancellationToken = default)
     {
         if (id != model.Id) return BadRequest();
@@ -95,6 +99,7 @@ public class CatalogItemsController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteCatalogItem(int id, CancellationToken cancellationToken = default)
     {
         var item = await _db.CatalogItems.FindAsync([id], cancellationToken);

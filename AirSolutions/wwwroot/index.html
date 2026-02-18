@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
@@ -19,16 +19,16 @@
         <div class="collapse navbar-collapse" id="mainNav">
           <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
             <li class="nav-item"><a class="nav-link" href="clients/">Clientes</a></li>
-            <li class="nav-item"><a class="nav-link" href="catalog-items/">Catalogo</a></li>
-            <li class="nav-item"><a class="nav-link" href="quotes/">Cotizaciones</a></li>
+            <li class="nav-item"><a class="nav-link" href="catalog-items/">Catálogo</a></li>
+            <li class="nav-item"><a class="nav-link" href="quotes/">Cotizaciónes</a></li>
             <li class="nav-item">
-              <button id="openLoginBtn" type="button" class="btn btn-sm btn-outline-brand ms-lg-2" data-bs-toggle="modal" data-bs-target="#loginModal">Iniciar sesion</button>
+              <button id="openLoginBtn" type="button" class="btn btn-sm btn-outline-brand ms-lg-2" data-bs-toggle="modal" data-bs-target="#loginModal">Iniciar sesión</button>
             </li>
             <li class="nav-item d-none" id="welcomeItem">
               <span id="welcomeText" class="nav-link mb-0"></span>
             </li>
             <li class="nav-item d-none" id="logoutItem">
-              <button id="logoutBtn" type="button" class="btn btn-sm btn-outline-secondary">Cerrar sesion</button>
+              <button id="logoutBtn" type="button" class="btn btn-sm btn-outline-secondary">Cerrar sesión</button>
             </li>
           </ul>
         </div>
@@ -59,7 +59,7 @@
       <div class="modal-content">
         <form id="loginForm" novalidate>
           <div class="modal-header">
-            <h2 class="modal-title fs-5">Iniciar sesion</h2>
+            <h2 class="modal-title fs-5">Iniciar sesión</h2>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
           </div>
           <div class="modal-body">
@@ -68,7 +68,7 @@
               <input id="assistantUser" class="form-control" type="text" required>
             </div>
             <div>
-              <label class="form-label" for="assistantPass">Contrasena</label>
+              <label class="form-label" for="assistantPass">Contraseña</label>
               <input id="assistantPass" class="form-control" type="password" required>
             </div>
             <div id="loginResult" class="small mt-3 text-danger"></div>
@@ -165,7 +165,7 @@
         const username = userInput.value.trim();
         const password = passInput.value.trim();
         if (!username || !password) {
-          loginResult.textContent = 'Completa usuario y contrasena.';
+          loginResult.textContent = 'Completa usuario y contraseña.';
           return;
         }
 
@@ -179,7 +179,7 @@
 
           const data = await response.json();
           if (!response.ok || !data.accessToken) {
-            loginResult.textContent = (data && data.message) || 'No se pudo iniciar sesion.';
+            loginResult.textContent = (data && data.message) || 'No se pudo iniciar sesión.';
             return;
           }
 
@@ -192,9 +192,9 @@
           updateAuthUi();
           loginModal.hide();
           passInput.value = '';
-          setResult('Sesion iniciada correctamente.', 'success');
+          setResult('Sesión iniciada correctamente.', 'success');
         } catch {
-          loginResult.textContent = 'Error de conexion al iniciar sesion.';
+          loginResult.textContent = 'Error de conexión al iniciar sesión.';
         }
       }
 
@@ -208,7 +208,7 @@
         const token = getToken();
         if (!token) {
           loginModal.show();
-          setResult('Debes iniciar sesion para usar el asistente.', 'error');
+          setResult('Debes iniciar sesión para usar el asistente.', 'error');
           return;
         }
 
@@ -233,7 +233,7 @@
             clearSession();
             updateAuthUi();
             loginModal.show();
-            setResult('Sesion expirada. Inicia sesion nuevamente.', 'error');
+            setResult('Sesión expirada. Inicia sesión nuevamente.', 'error');
             return;
           }
 
@@ -249,7 +249,7 @@
             window.location.href = 'quotes/create.html?source=assistant';
           }
         } catch {
-          setResult('Error de conexion con el asistente.', 'error');
+          setResult('Error de conexión con el asistente.', 'error');
         } finally {
           sendBtn.disabled = false;
         }
@@ -271,7 +271,7 @@
       logoutBtn.addEventListener('click', function () {
         clearSession();
         updateAuthUi();
-        setResult('Sesion cerrada.', 'info');
+        setResult('Sesión cerrada.', 'info');
       });
 
       updateAuthUi();
@@ -279,3 +279,4 @@
   </script>
 </body>
 </html>
+

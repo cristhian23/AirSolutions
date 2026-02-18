@@ -7,7 +7,10 @@
       "launchBrowser": true,
       "applicationUrl": "http://localhost:5158",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "JWT_KEY": "THIS_IS_A_DEVELOPMENT_ONLY_JWT_KEY_1234567890",
+        "AUTH_SEED_ADMIN_PASSWORD": "Admin123!",
+        "GEMINI_API_KEY": "AIzaSyDjuWRFJ9pRfGQJDFEBE3vXM5Nlv0Vl9mo"
       }
     },
     "https": {
@@ -16,7 +19,10 @@
       "launchBrowser": true,
       "applicationUrl": "https://localhost:7274;http://localhost:5158",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "JWT_KEY": "THIS_IS_A_DEVELOPMENT_ONLY_JWT_KEY_1234567890",
+        "AUTH_SEED_ADMIN_PASSWORD": "Admin123!",
+        "GEMINI_API_KEY": "AIzaSyDjuWRFJ9pRfGQJDFEBE3vXM5Nlv0Vl9mo"
       }
     }
   }

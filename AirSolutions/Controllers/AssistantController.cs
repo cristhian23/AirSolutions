@@ -1,8 +1,9 @@
-using AirSolutions.Models.Assistant;
+﻿using AirSolutions.Models.Assistant;
 using AirSolutions.Data;
 using AirSolutions.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 
@@ -11,6 +12,7 @@ namespace AirSolutions.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
+[EnableRateLimiting("assistant")]
 public class AssistantController : ControllerBase
 {
     private readonly IAssistantService _assistantService;
@@ -147,7 +149,7 @@ public class AssistantController : ControllerBase
 
         var stopWords = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            "quiero","hacer","una","un","de","del","con","para","cotizacion","cotizar",
+            "quiero","hacer","una","un","de","del","con","para","cotización","cotizar",
             "instalacion","servicio","cliente","segundo","piso","2do","primer","1er"
         };
 
@@ -197,3 +199,4 @@ public class AssistantController : ControllerBase
         }
     }
 }
+

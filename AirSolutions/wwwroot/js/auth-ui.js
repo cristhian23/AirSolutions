@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
   const TOKEN_KEY = 'airsolutions_jwt';
   const USER_KEY = 'airsolutions_user';
   const API_AUTH = '/api/auth/login';
@@ -56,7 +56,7 @@
       '    <div class="modal-content">',
       '      <form id="globalLoginForm" novalidate>',
       '        <div class="modal-header">',
-      '          <h2 class="modal-title fs-5">Iniciar sesion</h2>',
+      '          <h2 class="modal-title fs-5">Iniciar sesión</h2>',
       '          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>',
       '        </div>',
       '        <div class="modal-body">',
@@ -65,7 +65,7 @@
       '            <input id="globalAssistantUser" class="form-control" type="text" required>',
       '          </div>',
       '          <div>',
-      '            <label class="form-label" for="globalAssistantPass">Contrasena</label>',
+      '            <label class="form-label" for="globalAssistantPass">Contraseña</label>',
       '            <input id="globalAssistantPass" class="form-control" type="password" required>',
       '          </div>',
       '          <div id="globalLoginResult" class="small mt-3 text-danger"></div>',
@@ -95,11 +95,46 @@
 
     if (logged) {
       const displayName = pickDisplayName(user) || 'Usuario';
-      welcomeText.textContent = 'Bienvenido "' + displayName + '"';
+      welcomeText.textContent = 'Bienvenido ' + displayName + '';
     } else {
       welcomeText.textContent = '';
     }
   }
+
+  const nativeFetch = window.fetch.bind(window);
+  window.fetch = function (input, init) {
+    try {
+      const token = getToken();
+      let url = '';
+      if (typeof input === 'string') {
+        url = input;
+      } else if (input && typeof input.url === 'string') {
+        url = input.url;
+      }
+
+      const isApiCall = /^\/api\//i.test(url) || /^https?:\/\/[^/]+\/api\//i.test(url);
+      if (!isApiCall || !token) {
+        return nativeFetch(input, init);
+      }
+
+      const requestInit = init ? { ...init } : {};
+      const headers = new Headers(requestInit.headers || (input instanceof Request ? input.headers : undefined));
+      if (!headers.has('Authorization')) {
+        headers.set('Authorization', 'Bearer ' + token);
+      }
+      requestInit.headers = headers;
+
+      return nativeFetch(input, requestInit).then(response => {
+        if (response.status === 401) {
+          clearSession();
+          updateAuthUi();
+        }
+        return response;
+      });
+    } catch {
+      return nativeFetch(input, init);
+    }
+  };
 
   const loginModalElement = ensureLoginModal();
   const loginModal = new bootstrap.Modal(loginModalElement);
@@ -112,7 +147,7 @@
     const username = userInput.value.trim();
     const password = passInput.value.trim();
     if (!username || !password) {
-      loginResult.textContent = 'Completa usuario y contrasena.';
+      loginResult.textContent = 'Completa usuario y contraseña.';
       return;
     }
 
@@ -126,7 +161,7 @@
 
       const data = await response.json();
       if (!response.ok || !data.accessToken) {
-        loginResult.textContent = (data && data.message) || 'No se pudo iniciar sesion.';
+        loginResult.textContent = (data && data.message) || 'No se pudo iniciar sesión.';
         return;
       }
 
@@ -140,7 +175,7 @@
       loginModal.hide();
       updateAuthUi();
     } catch {
-      loginResult.textContent = 'Error de conexion al iniciar sesion.';
+      loginResult.textContent = 'Error de conexión al iniciar sesión.';
     }
   }
 
@@ -161,3 +196,4 @@
 
   updateAuthUi();
 })();
+

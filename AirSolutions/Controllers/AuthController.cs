@@ -1,8 +1,9 @@
-using AirSolutions.Models.Auth;
+﻿using AirSolutions.Models.Auth;
 using AirSolutions.Models;
 using AirSolutions.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -32,12 +33,13 @@ public class AuthController : ControllerBase
     }
 
     [AllowAnonymous]
+    [EnableRateLimiting("auth")]
     [HttpPost("login")]
     public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest request, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(request.Username) || string.IsNullOrWhiteSpace(request.Password))
         {
-            return BadRequest(new { message = "Usuario y contrasena son obligatorios." });
+            return BadRequest(new { message = "Usuario y contraseña son obligatorios." });
         }
 
         var user = await _db.Users.FirstOrDefaultAsync(
@@ -46,20 +48,21 @@ public class AuthController : ControllerBase
 
         if (user == null || !user.IsActive)
         {
-            return Unauthorized(new { message = "Credenciales invalidas." });
+            return Unauthorized(new { message = "Credenciales inválidas." });
         }
 
         var verify = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
         if (verify == PasswordVerificationResult.Failed)
         {
-            return Unauthorized(new { message = "Credenciales invalidas." });
+            return Unauthorized(new { message = "Credenciales inválidas." });
         }
 
         user.LastLoginAt = DateTime.UtcNow;
         await _db.SaveChangesAsync(cancellationToken);
 
         var expiresAtUtc = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiresMinutes <= 0 ? 480 : _jwtSettings.ExpiresMinutes);
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
+        var jwtKey = ResolveJwtKey();
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var claims = new[]
         {
@@ -87,4 +90,17 @@ public class AuthController : ControllerBase
             Role = user.Role
         });
     }
+
+    private string ResolveJwtKey()
+    {
+        var envKey = Environment.GetEnvironmentVariable("JWT_KEY");
+        var key = string.IsNullOrWhiteSpace(envKey) ? _jwtSettings.Key : envKey.Trim();
+        if (string.IsNullOrWhiteSpace(key) || key.Length < 32)
+        {
+            throw new InvalidOperationException("JWT key no configurada o muy corta. Define JWT_KEY con al menos 32 caracteres.");
+        }
+
+        return key;
+    }
 }
+

@@ -1,4 +1,4 @@
-using AirSolutions.Models.Assistant;
+﻿using AirSolutions.Models.Assistant;
 using Microsoft.Extensions.Options;
 using System.Text;
 using System.Text.Json;
@@ -145,10 +145,10 @@ public class GeminiAssistantService : IAssistantService
             "  \"assistantMessage\": \"string\"\n" +
             "}\n\n" +
             "Reglas:\n" +
-            "- Si piden crear cotizacion => action=open_quote_create, intent=create_quote, nextRoute=/quotes/create.\n" +
+            "- Si piden crear cotización => action=open_quote_create, intent=create_quote, nextRoute=/quotes/create.\n" +
             "- No inventes datos numericos si no vienen en el texto.\n" +
             "- Campos no detectados deben ir en null.\n" +
-            "- missingFields debe listar datos utiles para completar una cotizacion.\n" +
+            "- missingFields debe listar datos útiles para completar una cotización.\n" +
             "- Responde en espanol en assistantMessage.\n\n" +
             "Mensaje del usuario:\n" + message;
     }
@@ -277,7 +277,7 @@ public class GeminiAssistantService : IAssistantService
                 Action = "chat_reply",
                 Intent = "unknown",
                 Confidence = 0.45m,
-                AssistantMessage = "Puedo ayudarte a crear una cotizacion. Indica servicio, area, cliente y cantidades."
+                AssistantMessage = "Puedo ayudarte a crear una cotización. Indica servicio, area, cliente y cantidades."
             };
         }
 
@@ -304,7 +304,7 @@ public class GeminiAssistantService : IAssistantService
             NextRoute = "/quotes/create.html",
             Prefill = prefill,
             MissingFields = missing,
-            AssistantMessage = "Abrire el modulo de cotizaciones y completare los campos detectados."
+            AssistantMessage = "Abriré el módulo de cotizaciónes y completaré los campos detectados."
         };
     }
 
@@ -381,3 +381,4 @@ public class GeminiAssistantService : IAssistantService
         return null;
     }
 }
+
