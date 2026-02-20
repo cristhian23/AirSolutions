@@ -103,6 +103,7 @@
     }
 
     function loadClients() {
+      alertPlaceholder.innerHTML = '';
       const params = new URLSearchParams();
       const search = searchInput.value.trim();
       const isActive = filterActive.value;
@@ -118,6 +119,7 @@
           return r.json();
         })
         .then(data => {
+          alertPlaceholder.innerHTML = '';
           if (data.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No hay clientes.</td></tr>';
             return;
@@ -160,6 +162,18 @@
         .then(r => { if (!r.ok) throw new Error(); loadClients(); showAlert('Cliente eliminado.', 'success'); })
         .catch(() => showAlert('No se pudo eliminar.'));
     }
+
+    window.addEventListener('airsolutions:auth', (event) => {
+      if (event && event.detail && event.detail.loggedIn) {
+        alertPlaceholder.innerHTML = '';
+        loadClients();
+      }
+    });
+
+    window.airsolutionsRefresh = () => {
+      alertPlaceholder.innerHTML = '';
+      loadClients();
+    };
 
     formSearch.addEventListener('submit', e => { e.preventDefault(); loadClients(); });
     btnClear.addEventListener('click', () => { searchInput.value = ''; filterActive.value = ''; loadClients(); });

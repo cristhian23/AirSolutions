@@ -123,11 +123,13 @@
     }
 
     async function loadClientsFilter() {
+      alertPlaceholder.innerHTML = '';
       try {
         const response = await fetch(API_CLIENTS + '?isActive=true');
         if (response.status === 401) throw new Error('AUTH_REQUIRED');
         if (!response.ok) throw new Error('LOAD_ERROR');
         const clients = await response.json();
+        alertPlaceholder.innerHTML = '';
         const options = clients.map(c => '<option value="' + c.id + '">' + escapeHtml(getClientName(c)) + '</option>').join('');
         filterClient.innerHTML = '<option value="">Todos</option>' + options;
       } catch (err) {
@@ -139,6 +141,7 @@
     }
 
     async function loadQuotes() {
+      alertPlaceholder.innerHTML = '';
       const params = new URLSearchParams();
       const search = searchInput.value.trim();
       const clientId = filterClient.value;
@@ -153,6 +156,7 @@
         if (!response.ok) throw new Error('LOAD_ERROR');
         const rows = await response.json();
 
+        alertPlaceholder.innerHTML = '';
         if (!rows.length) {
           tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No hay cotizaciónes.</td></tr>';
           return;
@@ -213,6 +217,18 @@
         showAlert('No se pudo eliminar la cotización.');
       }
     }
+
+    window.addEventListener('airsolutions:auth', (event) => {
+      if (event && event.detail && event.detail.loggedIn) {
+        alertPlaceholder.innerHTML = '';
+        loadClientsFilter().then(loadQuotes);
+      }
+    });
+
+    window.airsolutionsRefresh = () => {
+      alertPlaceholder.innerHTML = '';
+      loadClientsFilter().then(loadQuotes);
+    };
 
     formSearch.addEventListener('submit', e => {
       e.preventDefault();

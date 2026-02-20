@@ -116,6 +116,7 @@
     }
 
     function loadItems() {
+      alertPlaceholder.innerHTML = '';
       const params = new URLSearchParams();
       const search = searchInput.value.trim();
       const itemType = filterType.value;
@@ -133,6 +134,7 @@
           return r.json();
         })
         .then(data => {
+          alertPlaceholder.innerHTML = '';
           if (data.length === 0) {
             tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">No hay items.</td></tr>';
             return;
@@ -177,6 +179,18 @@
         .then(r => { if (!r.ok) throw new Error(); loadItems(); showAlert('Item eliminado.', 'success'); })
         .catch(() => showAlert('No se pudo eliminar.', 'danger'));
     }
+
+    window.addEventListener('airsolutions:auth', (event) => {
+      if (event && event.detail && event.detail.loggedIn) {
+        alertPlaceholder.innerHTML = '';
+        loadItems();
+      }
+    });
+
+    window.airsolutionsRefresh = () => {
+      alertPlaceholder.innerHTML = '';
+      loadItems();
+    };
 
     formSearch.addEventListener('submit', e => { e.preventDefault(); loadItems(); });
     btnClear.addEventListener('click', () => { searchInput.value = ''; filterType.value = ''; filterActive.value = ''; loadItems(); });

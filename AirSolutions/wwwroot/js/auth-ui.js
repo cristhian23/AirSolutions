@@ -101,6 +101,26 @@
     }
   }
 
+  function emitAuthEvent(logged, user) {
+    try {
+      window.dispatchEvent(new CustomEvent('airsolutions:auth', {
+        detail: { loggedIn: logged, user: user || null }
+      }));
+    } catch {
+      // no-op
+    }
+  }
+
+  function refreshModuleData() {
+    try {
+      if (typeof window.airsolutionsRefresh === 'function') {
+        window.airsolutionsRefresh();
+      }
+    } catch {
+      // no-op
+    }
+  }
+
   const nativeFetch = window.fetch.bind(window);
   window.fetch = function (input, init) {
     try {
@@ -128,6 +148,7 @@
         if (response.status === 401) {
           clearSession();
           updateAuthUi();
+          emitAuthEvent(false, null);
         }
         return response;
       });
@@ -142,6 +163,22 @@
   const userInput = document.getElementById('globalAssistantUser');
   const passInput = document.getElementById('globalAssistantPass');
   const loginResult = document.getElementById('globalLoginResult');
+
+  let pendingAuthRefresh = false;
+
+  loginModalElement.addEventListener('hidden.bs.modal', () => {
+    if (!openLoginBtn.classList.contains('d-none')) {
+      openLoginBtn.focus();
+    } else if (!logoutBtn.classList.contains('d-none')) {
+      logoutBtn.focus();
+    }
+
+    if (pendingAuthRefresh) {
+      pendingAuthRefresh = false;
+      emitAuthEvent(true, getStoredUser());
+      refreshModuleData();
+    }
+  });
 
   async function login() {
     const username = userInput.value.trim();
@@ -172,6 +209,7 @@
       });
 
       passInput.value = '';
+      pendingAuthRefresh = true;
       loginModal.hide();
       updateAuthUi();
     } catch {
@@ -192,6 +230,8 @@
   logoutBtn.addEventListener('click', function () {
     clearSession();
     updateAuthUi();
+    emitAuthEvent(false, null);
+    refreshModuleData();
   });
 
   updateAuthUi();
