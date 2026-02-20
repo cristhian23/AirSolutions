@@ -43,6 +43,27 @@
     return (value == null ? '' : String(value)).trim();
   }
 
+  async function loadLogoDataUrl() {
+    const logoCandidates = ['/logo.png', '/logo.png.png'];
+    for (const path of logoCandidates) {
+      try {
+        const response = await fetch(path);
+        if (!response.ok) continue;
+        const blob = await response.blob();
+        const dataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = function () { resolve(reader.result); };
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        return dataUrl;
+      } catch {
+        // Try next candidate.
+      }
+    }
+    return null;
+  }
+
   function truncateText(doc, text, maxWidth) {
     const clean = cleanText(text || '-');
     if (!clean) return '-';
@@ -56,28 +77,7 @@
     return (output || clean).trim() + ellipsis;
   }
 
-  async function loadLogoDataUrl() {
-    const logoCandidates = ['/logo.png', '/logo.png.png'];
-    for (const path of logoCandidates) {
-      try {
-        const response = await fetch(path);
-        if (!response.ok) continue;
-        const blob = await response.blob();
-        const dataUrl = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-        return dataUrl;
-      } catch {
-        // Try next candidate.
-      }
-    }
-    return null;
-  }
-
-  function drawHeader(doc, quote, logoDataUrl) {
+  function drawHeader(doc, invoice, logoDataUrl) {
     const pageWidth = doc.internal.pageSize.getWidth();
     const centerX = pageWidth / 2;
 
@@ -100,17 +100,17 @@
     doc.text('Mas que aires, soluciones', centerX, 148, { align: 'center' });
     doc.text('809-657-3428 | airsolutionsrd@gmail.com', centerX, 162, { align: 'center' });
 
+    doc.setTextColor(BLUE[0], BLUE[1], BLUE[2]);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(24);
-    doc.setTextColor(BLUE[0], BLUE[1], BLUE[2]);
-    doc.text('COTIZACIÓN', centerX, 195, { align: 'center' });
+    doc.text('FACTURA', centerX, 195, { align: 'center' });
 
     doc.setDrawColor(BORDER_GRAY[0], BORDER_GRAY[1], BORDER_GRAY[2]);
     doc.setLineWidth(0.8);
     doc.line(46, 210, pageWidth - 46, 210);
   }
 
-  function drawQuoteInfo(doc, quote) {
+  function drawInvoiceInfo(doc, invoice) {
     const pageWidth = doc.internal.pageSize.getWidth();
     const leftX = 46;
     const rightX = pageWidth / 2 + 10;
@@ -120,14 +120,14 @@
     const rowGap = 20;
 
     const rows = [
-      ['Cotización #', quote.id || '-'],
-      ['Nombre', cleanText(quote.name || 'Sin nombre')],
-      ['Cliente', clientName(quote.client)],
+      ['Factura #', invoice.invoiceCode || ('FACTURA-' + (invoice.id || '-'))],
+      ['Cliente', clientName(invoice.client)],
+      ['Comprobante', (invoice.fiscalVoucher && invoice.fiscalVoucher.voucherNumber) ? invoice.fiscalVoucher.voucherNumber : 'Sin comprobante'],
       ['Vendedor', 'Cristhian Cuevas'],
       ['Contacto', '809-657-3428'],
       ['Correo', 'airsolutionsrd@gmail.com'],
-      ['Fecha emisión', formatDate(quote.createdAt)],
-      ['Actualizado', formatDate(quote.updatedAt)]
+      ['Fecha emisión', formatDate(invoice.issueDate || invoice.createdAt)],
+      ['Fecha venc.', formatDate(invoice.dueDate)]
     ];
 
     rows.forEach(function (row, index) {
@@ -151,7 +151,7 @@
     return endY + 24;
   }
 
-  function drawQuoteTable(doc, quote, startY) {
+  function drawInvoiceTable(doc, invoice, startY) {
     const x = 47.64;
     const y = startY;
     const tableWidth = 500;
@@ -160,7 +160,7 @@
     const rowH = 22;
     const minLines = 4;
 
-    const lines = (quote.lines || []).map(line => {
+    const lines = (invoice.lines || []).map(function (line) {
       return {
         qty: formatQty(line.quantity),
         description: cleanText(line.name || line.description || '-'),
@@ -173,17 +173,14 @@
       lines.push({ qty: '', description: '', unitPrice: '', total: '' });
     }
 
-    const visibleLines = lines;
-
-    const subtotal = (quote.lines || []).reduce((sum, line) => sum + parseNumber(line.lineTotal, 0), 0);
-
-    const tableH = headerH + (visibleLines.length * rowH) + rowH;
+    const subtotal = parseNumber(invoice.grandTotal, 0);
+    const tableH = headerH + (lines.length * rowH) + rowH;
 
     doc.setFillColor(BLUE[0], BLUE[1], BLUE[2]);
     doc.rect(x, y, tableWidth, headerH, 'F');
 
     doc.setFillColor(LIGHT_GRAY[0], LIGHT_GRAY[1], LIGHT_GRAY[2]);
-    doc.rect(x + colWidths[0] + colWidths[1], y + headerH + (visibleLines.length * rowH), colWidths[2] + colWidths[3], rowH, 'F');
+    doc.rect(x + colWidths[0] + colWidths[1], y + headerH + (lines.length * rowH), colWidths[2] + colWidths[3], rowH, 'F');
 
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
@@ -197,14 +194,13 @@
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
 
-    visibleLines.forEach((line, index) => {
+    lines.forEach(function (line, index) {
       const rowY = y + headerH + (index * rowH);
       doc.text(line.qty, x + 6, rowY + 11);
 
       const descX = x + colWidths[0] + 6;
       const descMaxWidth = colWidths[1] - 12;
-      const descText = line.description || '';
-      const wrapped = doc.splitTextToSize(descText, descMaxWidth);
+      const wrapped = doc.splitTextToSize(line.description || '', descMaxWidth);
       if (wrapped.length > 0) {
         doc.text(wrapped[0], descX, rowY + 14);
       }
@@ -213,7 +209,7 @@
       doc.text(line.total, x + tableWidth - 6, rowY + 14, { align: 'right' });
     });
 
-    const totalY = y + headerH + (visibleLines.length * rowH);
+    const totalY = y + headerH + (lines.length * rowH);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
     doc.text('Total General', x + colWidths[0] + colWidths[1] + 30, totalY + 14);
@@ -230,40 +226,31 @@
       x + tableWidth
     ];
 
-    verticals.forEach(vx => doc.line(vx, y, vx, y + tableH));
+    verticals.forEach(function (vx) { doc.line(vx, y, vx, y + tableH); });
 
     doc.line(x, y, x + tableWidth, y);
     doc.line(x, y + headerH, x + tableWidth, y + headerH);
 
-    for (let i = 1; i <= visibleLines.length; i++) {
+    for (let i = 1; i <= lines.length; i++) {
       const rowLineY = y + headerH + (i * rowH);
       doc.line(x, rowLineY, x + tableWidth, rowLineY);
     }
 
     doc.line(x, y + tableH, x + tableWidth, y + tableH);
-
     return y + tableH;
   }
 
-  function drawPriceBreakdown(doc, quote, startY) {
+  function drawPriceBreakdown(doc, invoice, startY) {
     const x = 320;
     const labelX = x + 12;
     const valueX = x + 212;
     const width = 230;
     const rowH = 22;
 
-    const subtotal = (quote.lines || []).reduce(function (sum, line) {
-      return sum + parseNumber(line.lineSubtotal, 0);
-    }, 0);
-    const discount = (quote.lines || []).reduce(function (sum, line) {
-      return sum + parseNumber(line.discountTotal, 0);
-    }, 0);
-    const tax = (quote.lines || []).reduce(function (sum, line) {
-      return sum + parseNumber(line.taxTotal, 0);
-    }, 0);
-    const netTotal = (quote.lines || []).reduce(function (sum, line) {
-      return sum + parseNumber(line.lineTotal, 0);
-    }, 0);
+    const subtotal = parseNumber(invoice.subtotal, 0);
+    const discount = parseNumber(invoice.discountTotal, 0);
+    const tax = parseNumber(invoice.taxTotal, 0);
+    const netTotal = parseNumber(invoice.grandTotal, 0);
 
     doc.setDrawColor(BORDER_GRAY[0], BORDER_GRAY[1], BORDER_GRAY[2]);
     doc.setLineWidth(0.5);
@@ -298,46 +285,29 @@
     });
   }
 
-  function drawNotes(doc, startY) {
-    doc.setTextColor(BLUE[0], BLUE[1], BLUE[2]);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.text('Notas:', 46, startY);
-
-    doc.setTextColor(0, 0, 0);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    doc.text('- Esta cotización es válida por 7 días.', 46, startY + 17);
-    doc.text('- Precios incluyen transporte.', 46, startY + 31);
-  }
-
-  async function generateQuotePdf(quote, options) {
+  async function generateInvoicePdf(invoice, options) {
     if (!window.jspdf || !window.jspdf.jsPDF) {
       throw new Error('jsPDF no esta disponible.');
     }
 
-    const { jsPDF } = window.jspdf;
+    const jsPDF = window.jspdf.jsPDF;
     const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
 
     const logoDataUrl = await loadLogoDataUrl();
-    drawHeader(doc, quote, logoDataUrl);
-    const tableStartY = drawQuoteInfo(doc, quote);
-    const tableBottom = drawQuoteTable(doc, quote, tableStartY);
-    drawPriceBreakdown(doc, quote, tableBottom + 24);
-    drawNotes(doc, tableBottom + 24);
+    drawHeader(doc, invoice, logoDataUrl);
+    const tableStartY = drawInvoiceInfo(doc, invoice);
+    const tableBottom = drawInvoiceTable(doc, invoice, tableStartY);
+    drawPriceBreakdown(doc, invoice, tableBottom + 24);
 
-    const safeName = (quote.name || 'cotización')
+    const code = cleanText(invoice.invoiceCode || ('FACTURA-' + (invoice.id || 'sin_id')))
       .replace(/[^a-z0-9_-]+/gi, '_')
       .toLowerCase();
-
-    const fileName = (options && options.fileName)
-      || ('cotización_' + (quote.id || 'sin_id') + '_' + safeName + '.pdf');
+    const fileName = (options && options.fileName) || ('factura_' + code + '.pdf');
 
     doc.save(fileName);
   }
 
-  window.QuotePdf = {
-    generateQuotePdf
+  window.InvoicePdf = {
+    generateInvoicePdf: generateInvoicePdf
   };
 })();
-

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Detalle factura - AirSolutions</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/site.css" rel="stylesheet">
+</head>
+<body class="landing-bizland module-page">
+  <header class="main-header sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <div class="container">
+        <a class="navbar-brand brand-mark" href="/">Air<span>Solutions</span></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+            <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+            <li class="nav-item"><a class="nav-link" href="../clients/">Clientes</a></li>
+            <li class="nav-item"><a class="nav-link" href="../catalog-items/">Catálogo</a></li>
+            <li class="nav-item"><a class="nav-link" href="../quotes/">Cotizaciones</a></li>
+            <li class="nav-item"><a class="nav-link active" href="../invoices/">Facturacion</a></li>
+            <li class="nav-item"><button id="openLoginBtn" type="button" class="btn btn-sm btn-outline-brand ms-lg-2">Iniciar sesion</button></li>
+            <li class="nav-item d-none" id="welcomeItem"><span id="welcomeText" class="nav-link mb-0"></span></li>
+            <li class="nav-item d-none" id="logoutItem"><button id="logoutBtn" type="button" class="btn btn-sm btn-outline-secondary">Cerrar sesion</button></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container my-4">
+    <div class="d-flex align-items-center gap-2 mb-4 flex-wrap">
+      <a class="btn btn-outline-secondary btn-sm" href="index.html">Volver</a>
+      <h1 class="h2 mb-0">Detalle de factura</h1>
+      <button type="button" class="btn btn-outline-success btn-sm ms-auto" id="btnPdf">Descargar PDF</button>
+      <button type="button" class="btn btn-outline-warning btn-sm" id="btnCancelInvoice">Cancelar factura</button>
+    </div>
+
+    <div id="alertPlaceholder"></div>
+    <div class="card mb-3" id="headerCard"><div class="card-body text-center text-muted">Cargando...</div></div>
+
+    <div class="card mb-3">
+      <div class="card-header bg-light fw-semibold">Lineas</div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped align-middle mb-0">
+            <thead class="table-light"><tr><th>Nombre</th><th class="text-end">Cant.</th><th class="text-end">Precio</th><th class="text-end">Desc</th><th class="text-end">ITBIS</th><th class="text-end">Total</th></tr></thead>
+            <tbody id="linesBody"><tr><td colspan="6" class="text-center text-muted">Cargando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-header bg-light fw-semibold">Pagos</div>
+          <div class="card-body">
+            <form id="formPayment" class="row g-2 mb-3">
+              <div class="col-md-4"><input type="date" id="paymentDate" class="form-control"></div>
+              <div class="col-md-4"><input type="number" id="paymentAmount" class="form-control" min="0.01" step="0.01" placeholder="Monto"></div>
+              <div class="col-md-4"><input type="text" id="paymentMethod" class="form-control" maxlength="50" placeholder="Metodo"></div>
+              <div class="col-md-8"><input type="text" id="paymentReference" class="form-control" maxlength="100" placeholder="Referencia"></div>
+              <div class="col-md-4"><button type="submit" class="btn btn-primary w-100">Registrar pago</button></div>
+            </form>
+            <div class="table-responsive">
+              <table class="table table-sm mb-0">
+                <thead><tr><th>Fecha</th><th>Método</th><th>Referencia</th><th class="text-end">Monto</th></tr></thead>
+                <tbody id="paymentsBody"><tr><td colspan="4" class="text-center text-muted">Sin pagos.</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <table class="table table-sm mb-0">
+              <tr><th>Subtotal</th><td class="text-end" id="summarySubtotal">RD$ 0.00</td></tr>
+              <tr><th>Descuento</th><td class="text-end" id="summaryDiscount">RD$ 0.00</td></tr>
+              <tr><th>ITBIS</th><td class="text-end" id="summaryTax">RD$ 0.00</td></tr>
+              <tr><th>Total</th><td class="text-end" id="summaryTotal">RD$ 0.00</td></tr>
+              <tr><th>Pagado</th><td class="text-end" id="summaryPaid">RD$ 0.00</td></tr>
+              <tr class="table-light fw-semibold"><th>Balance</th><td class="text-end" id="summaryBalance">RD$ 0.00</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/auth-ui.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+  <script src="../js/invoice-pdf.js"></script>
+  <script>
+    const invoiceId = new URLSearchParams(location.search).get('id');
+    if (!invoiceId) { location.href = 'index.html'; throw new Error('ID requerido'); }
+    const API_INVOICES = '/api/invoices';
+
+    const alertPlaceholder = document.getElementById('alertPlaceholder');
+    const headerCard = document.getElementById('headerCard');
+    const linesBody = document.getElementById('linesBody');
+    const paymentsBody = document.getElementById('paymentsBody');
+    const btnCancelInvoice = document.getElementById('btnCancelInvoice');
+    const btnPdf = document.getElementById('btnPdf');
+    let currentInvoice = null;
+
+    function showAlert(message, type) {
+      alertPlaceholder.innerHTML = '<div class="alert alert-' + (type || 'danger') + ' alert-dismissible fade show" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>';
+    }
+
+    function parseNumber(value) {
+      const n = parseFloat(value);
+      return isNaN(n) ? 0 : n;
+    }
+
+    function formatMoney(value) {
+      return 'RD$ ' + parseNumber(value).toFixed(2);
+    }
+
+    function formatDate(value) {
+      if (!value) return '-';
+      const dt = new Date(value);
+      return isNaN(dt.getTime()) ? '-' : dt.toLocaleString('es-DO');
+    }
+
+    function getClientName(client) {
+      if (!client) return '-';
+      if (client.clientType === 'Company') return client.companyName || '-';
+      return ((client.firstName || '') + ' ' + (client.lastName || '')).trim() || '-';
+    }
+
+    async function loadInvoice() {
+      try {
+        const response = await fetch(API_INVOICES + '/' + invoiceId);
+        if (!response.ok) throw new Error('LOAD');
+        const data = await response.json();
+        currentInvoice = data;
+
+        const voucherText = data.fiscalVoucher ? (data.fiscalVoucher.voucherNumber + ' (usado en factura #' + (data.fiscalVoucher.usedInInvoiceId || '-') + ', fecha: ' + formatDate(data.fiscalVoucher.usedAt) + ')') : 'Sin comprobante';
+        headerCard.querySelector('.card-body').innerHTML =
+          '<div class="row g-3">' +
+          '<div class="col-md-8"><h3 class="h5 mb-1">' + (data.invoiceCode || ('FACTURA-' + data.id)) + '</h3><p class="text-muted mb-0">' + (data.description || '-') + '</p></div>' +
+          '<div class="col-md-4">' +
+          '<div><strong>Cliente:</strong> ' + getClientName(data.client) + '</div>' +
+          '<div><strong>Estado:</strong> ' + (data.status || '-') + '</div>' +
+          '<div><strong>Comprobante:</strong> ' + voucherText + '</div>' +
+          '</div>' +
+          '</div>';
+
+        if (!data.lines || !data.lines.length) {
+          linesBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Sin lineas.</td></tr>';
+        } else {
+          linesBody.innerHTML = data.lines.map(l => {
+            return '<tr>' +
+              '<td>' + (l.name || '-') + '</td>' +
+              '<td class="text-end">' + parseNumber(l.quantity).toFixed(2) + '</td>' +
+              '<td class="text-end">' + formatMoney(l.unitPrice) + '</td>' +
+              '<td class="text-end">' + parseNumber(l.discountValue).toFixed(2) + '%</td>' +
+              '<td class="text-end">' + (l.isTaxable ? parseNumber(l.taxRate).toFixed(2) + '%' : '0.00%') + '</td>' +
+              '<td class="text-end fw-semibold">' + formatMoney(l.lineTotal) + '</td>' +
+              '</tr>';
+          }).join('');
+        }
+
+        const payments = data.payments || [];
+        if (!payments.length) {
+          paymentsBody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Sin pagos.</td></tr>';
+        } else {
+          paymentsBody.innerHTML = payments.map(p =>
+            '<tr><td>' + formatDate(p.paymentDate) + '</td><td>' + (p.method || '-') + '</td><td>' + (p.reference || '-') + '</td><td class="text-end">' + formatMoney(p.amount) + '</td></tr>'
+          ).join('');
+        }
+
+        document.getElementById('summarySubtotal').textContent = formatMoney(data.subtotal);
+        document.getElementById('summaryDiscount').textContent = formatMoney(data.discountTotal);
+        document.getElementById('summaryTax').textContent = formatMoney(data.taxTotal);
+        document.getElementById('summaryTotal').textContent = formatMoney(data.grandTotal);
+        document.getElementById('summaryPaid').textContent = formatMoney(data.paidTotal);
+        document.getElementById('summaryBalance').textContent = formatMoney(data.balanceDue);
+      } catch {
+        showAlert('No se pudo cargar la factura.');
+      }
+    }
+
+    document.getElementById('formPayment').addEventListener('submit', async e => {
+      e.preventDefault();
+      const amount = parseNumber(document.getElementById('paymentAmount').value);
+      const method = document.getElementById('paymentMethod').value.trim();
+      if (amount <= 0 || !method) {
+        showAlert('Completa monto y metodo de pago.', 'warning');
+        return;
+      }
+
+      const payload = {
+        paymentDate: document.getElementById('paymentDate').value || null,
+        amount,
+        method,
+        reference: document.getElementById('paymentReference').value.trim() || null
+      };
+
+      try {
+        const response = await fetch(API_INVOICES + '/' + invoiceId + '/payments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        if (!response.ok) {
+          showAlert((result.errors && result.errors.join('<br>')) || 'No se pudo registrar el pago.');
+          return;
+        }
+        showAlert('Pago registrado.', 'success');
+        document.getElementById('formPayment').reset();
+        loadInvoice();
+      } catch {
+        showAlert('Error de conexion al registrar pago.');
+      }
+    });
+
+    btnCancelInvoice.addEventListener('click', async () => {
+      if (!confirm('Cancelar esta factura? Si tiene comprobante fiscal asignado, se liberara.')) return;
+      try {
+        const response = await fetch(API_INVOICES + '/' + invoiceId + '/cancel', { method: 'POST' });
+        const result = await response.json();
+        if (!response.ok) {
+          showAlert((result.errors && result.errors.join('<br>')) || 'No se pudo cancelar la factura.');
+          return;
+        }
+        showAlert('Factura cancelada correctamente.', 'success');
+        loadInvoice();
+      } catch {
+        showAlert('Error de conexion al cancelar factura.');
+      }
+    });
+
+    btnPdf.addEventListener('click', async () => {
+      if (!currentInvoice) {
+        showAlert('Aun no se ha cargado la factura.', 'warning');
+        return;
+      }
+
+      try {
+        await window.InvoicePdf.generateInvoicePdf(currentInvoice);
+      } catch {
+        showAlert('No se pudo generar el PDF de la factura.');
+      }
+    });
+
+    loadInvoice();
+  </script>
+</body>
+</html>

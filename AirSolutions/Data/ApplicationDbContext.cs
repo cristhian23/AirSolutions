@@ -12,6 +12,10 @@ public class ApplicationDbContext : DbContext
     public DbSet<CatalogItem> CatalogItems => Set<CatalogItem>();
     public DbSet<Quote> Quotes => Set<Quote>();
     public DbSet<QuoteLine> QuoteLines => Set<QuoteLine>();
+    public DbSet<Invoice> Invoices => Set<Invoice>();
+    public DbSet<InvoiceLine> InvoiceLines => Set<InvoiceLine>();
+    public DbSet<InvoicePayment> InvoicePayments => Set<InvoicePayment>();
+    public DbSet<FiscalVoucher> FiscalVouchers => Set<FiscalVoucher>();
     public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -76,6 +80,80 @@ public class ApplicationDbContext : DbContext
                 .WithMany(q => q.Lines)
                 .HasForeignKey(l => l.QuoteId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Invoice>(e =>
+        {
+            e.HasKey(i => i.Id);
+            e.Property(i => i.InvoiceCode).HasMaxLength(50).IsRequired();
+            e.Property(i => i.Description).HasMaxLength(2000);
+            e.Property(i => i.Status).HasMaxLength(30).IsRequired();
+            e.Property(i => i.Subtotal).HasPrecision(18, 2);
+            e.Property(i => i.DiscountTotal).HasPrecision(18, 2);
+            e.Property(i => i.TaxTotal).HasPrecision(18, 2);
+            e.Property(i => i.GrandTotal).HasPrecision(18, 2);
+            e.Property(i => i.PaidTotal).HasPrecision(18, 2);
+            e.Property(i => i.BalanceDue).HasPrecision(18, 2);
+
+            e.HasOne(i => i.Client)
+                .WithMany()
+                .HasForeignKey(i => i.ClientId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            e.HasOne(i => i.Quote)
+                .WithMany()
+                .HasForeignKey(i => i.QuoteId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            e.HasOne(i => i.FiscalVoucher)
+                .WithOne(v => v.UsedInInvoice)
+                .HasForeignKey<Invoice>(i => i.FiscalVoucherId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            e.HasIndex(i => i.InvoiceCode).IsUnique();
+        });
+
+        modelBuilder.Entity<InvoiceLine>(e =>
+        {
+            e.HasKey(l => l.Id);
+            e.Property(l => l.Name).HasMaxLength(300).IsRequired();
+            e.Property(l => l.Description).HasMaxLength(2000);
+            e.Property(l => l.Quantity).HasPrecision(18, 2);
+            e.Property(l => l.UnitPrice).HasPrecision(18, 2);
+            e.Property(l => l.DiscountValue).HasPrecision(5, 2);
+            e.Property(l => l.DiscountTotal).HasPrecision(18, 2);
+            e.Property(l => l.TaxRate).HasPrecision(5, 2);
+            e.Property(l => l.TaxTotal).HasPrecision(18, 2);
+            e.Property(l => l.LineSubtotal).HasPrecision(18, 2);
+            e.Property(l => l.LineTotal).HasPrecision(18, 2);
+
+            e.HasOne(l => l.Invoice)
+                .WithMany(i => i.Lines)
+                .HasForeignKey(l => l.InvoiceId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<InvoicePayment>(e =>
+        {
+            e.HasKey(p => p.Id);
+            e.Property(p => p.Method).HasMaxLength(50).IsRequired();
+            e.Property(p => p.Reference).HasMaxLength(100);
+            e.Property(p => p.Notes).HasMaxLength(1000);
+            e.Property(p => p.Amount).HasPrecision(18, 2);
+
+            e.HasOne(p => p.Invoice)
+                .WithMany(i => i.Payments)
+                .HasForeignKey(p => p.InvoiceId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<FiscalVoucher>(e =>
+        {
+            e.HasKey(v => v.Id);
+            e.Property(v => v.VoucherNumber).HasMaxLength(50).IsRequired();
+            e.Property(v => v.VoucherType).HasMaxLength(50);
+            e.HasIndex(v => v.VoucherNumber).IsUnique();
+            e.HasIndex(v => v.IsUsed);
         });
 
         modelBuilder.Entity<User>(e =>

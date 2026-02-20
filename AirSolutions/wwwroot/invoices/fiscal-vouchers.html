@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Comprobantes fiscales - AirSolutions</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/site.css" rel="stylesheet">
+</head>
+<body class="landing-bizland module-page">
+  <header class="main-header sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <div class="container">
+        <a class="navbar-brand brand-mark" href="/">Air<span>Solutions</span></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+            <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+            <li class="nav-item"><a class="nav-link" href="../clients/">Clientes</a></li>
+            <li class="nav-item"><a class="nav-link" href="../catalog-items/">Catálogo</a></li>
+            <li class="nav-item"><a class="nav-link" href="../quotes/">Cotizaciones</a></li>
+            <li class="nav-item"><a class="nav-link" href="../invoices/">Facturacion</a></li>
+            <li class="nav-item"><a class="nav-link active" href="../invoices/fiscal-vouchers.html">Comprobantes</a></li>
+            <li class="nav-item"><button id="openLoginBtn" type="button" class="btn btn-sm btn-outline-brand ms-lg-2">Iniciar sesion</button></li>
+            <li class="nav-item d-none" id="welcomeItem"><span id="welcomeText" class="nav-link mb-0"></span></li>
+            <li class="nav-item d-none" id="logoutItem"><button id="logoutBtn" type="button" class="btn btn-sm btn-outline-secondary">Cerrar sesion</button></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container my-4">
+    <div class="d-flex align-items-center gap-2 mb-4 flex-wrap">
+      <a class="btn btn-outline-secondary btn-sm" href="index.html">Volver</a>
+      <h1 class="h2 mb-0">Comprobantes fiscales</h1>
+    </div>
+    <div id="alertPlaceholder"></div>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <form id="formVoucher" class="row g-2 align-items-end">
+          <div class="col-md-5">
+            <label class="form-label">Numero</label>
+            <input type="text" id="voucherNumber" class="form-control" maxlength="50" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Tipo</label>
+            <input type="text" id="voucherType" class="form-control" maxlength="50" placeholder="B01, B02, etc.">
+          </div>
+          <div class="col-md-3">
+            <button type="submit" class="btn btn-primary w-100">Agregar comprobante</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr><th>#</th><th>Numero</th><th>Tipo</th><th>Estado</th><th>Usado en factura</th><th>Fecha uso</th></tr>
+        </thead>
+        <tbody id="tbody"><tr><td colspan="6" class="text-center text-muted">Cargando...</td></tr></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/auth-ui.js"></script>
+  <script>
+    const API_VOUCHERS = '/api/fiscalvouchers';
+    const tbody = document.getElementById('tbody');
+    const alertPlaceholder = document.getElementById('alertPlaceholder');
+
+    function showAlert(message, type) {
+      alertPlaceholder.innerHTML = '<div class="alert alert-' + (type || 'danger') + ' alert-dismissible fade show" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>';
+    }
+
+    function formatDate(value) {
+      if (!value) return '-';
+      const dt = new Date(value);
+      return isNaN(dt.getTime()) ? '-' : dt.toLocaleString('es-DO');
+    }
+
+    async function loadVouchers() {
+      try {
+        const response = await fetch(API_VOUCHERS);
+        if (response.status === 401) throw new Error('AUTH');
+        if (!response.ok) throw new Error('LOAD');
+        const rows = await response.json();
+        if (!rows.length) {
+          tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No hay comprobantes registrados.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = rows.map((v, index) => {
+          return '<tr>' +
+            '<td>' + (index + 1) + '</td>' +
+            '<td>' + (v.voucherNumber || '-') + '</td>' +
+            '<td>' + (v.voucherType || '-') + '</td>' +
+            '<td>' + (v.isUsed ? '<span class="badge text-bg-danger">Usado</span>' : '<span class="badge text-bg-success">Disponible</span>') + '</td>' +
+            '<td>' + (v.usedInInvoiceId ? ('#' + v.usedInInvoiceId) : '-') + '</td>' +
+            '<td>' + formatDate(v.usedAt) + '</td>' +
+            '</tr>';
+        }).join('');
+      } catch (err) {
+        if (err && err.message === 'AUTH') {
+          showAlert('Debes iniciar sesion para ver comprobantes.', 'warning');
+          tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Inicia sesion para continuar.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">No se pudo cargar.</td></tr>';
+      }
+    }
+
+    document.getElementById('formVoucher').addEventListener('submit', async e => {
+      e.preventDefault();
+      const voucherNumber = document.getElementById('voucherNumber').value.trim();
+      const voucherType = document.getElementById('voucherType').value.trim();
+      if (!voucherNumber) {
+        showAlert('El numero de comprobante es obligatorio.', 'warning');
+        return;
+      }
+
+      try {
+        const response = await fetch(API_VOUCHERS, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ voucherNumber: voucherNumber, voucherType: voucherType || null })
+        });
+        const result = await response.json();
+        if (!response.ok) {
+          showAlert((result.errors && result.errors.join('<br>')) || result.message || 'No se pudo crear.');
+          return;
+        }
+        showAlert('Comprobante creado.', 'success');
+        e.target.reset();
+        loadVouchers();
+      } catch {
+        showAlert('Error de conexion al crear comprobante.');
+      }
+    });
+
+    loadVouchers();
+  </script>
+</body>
+</html>

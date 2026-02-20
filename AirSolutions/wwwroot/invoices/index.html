@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Facturacion - AirSolutions</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/site.css" rel="stylesheet">
+</head>
+<body class="landing-bizland module-page">
+  <header class="main-header sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <div class="container">
+        <a class="navbar-brand brand-mark" href="/">Air<span>Solutions</span></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+            <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+            <li class="nav-item"><a class="nav-link" href="../clients/">Clientes</a></li>
+            <li class="nav-item"><a class="nav-link" href="../catalog-items/">Catalogo</a></li>
+            <li class="nav-item"><a class="nav-link" href="../quotes/">Cotizaciones</a></li>
+            <li class="nav-item"><a class="nav-link active" href="../invoices/">Facturacion</a></li>
+            <li class="nav-item">
+              <button id="openLoginBtn" type="button" class="btn btn-sm btn-outline-brand ms-lg-2">Iniciar sesion</button>
+            </li>
+            <li class="nav-item d-none" id="welcomeItem"><span id="welcomeText" class="nav-link mb-0"></span></li>
+            <li class="nav-item d-none" id="logoutItem"><button id="logoutBtn" type="button" class="btn btn-sm btn-outline-secondary">Cerrar sesion</button></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container my-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+      <h1 class="h2 mb-0">Facturas</h1>
+      <div class="d-flex gap-2">
+        <a class="btn btn-outline-secondary" href="fiscal-vouchers.html">Comprobantes fiscales</a>
+        <a class="btn btn-primary" href="create.html">Nueva factura</a>
+      </div>
+    </div>
+
+    <div id="alertPlaceholder"></div>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <form id="formSearch" class="row g-2 align-items-end">
+          <div class="col-md-5">
+            <label class="form-label">Buscar</label>
+            <input type="text" class="form-control" id="search" placeholder="Nombre, cliente o comprobante...">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Estado</label>
+            <select id="status" class="form-select">
+              <option value="">Todos</option>
+              <option value="Draft">Draft</option>
+              <option value="Sent">Sent</option>
+              <option value="PartiallyPaid">PartiallyPaid</option>
+              <option value="Paid">Paid</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-outline-primary w-100">Buscar</button>
+          </div>
+          <div class="col-md-2">
+            <button type="button" class="btn btn-outline-secondary w-100" id="btnClear">Limpiar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>ID</th>
+            <th>Factura</th>
+            <th>Cliente</th>
+            <th>Estado</th>
+            <th>Comprobante</th>
+            <th class="text-end">Total</th>
+            <th class="text-end">Balance</th>
+            <th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td colspan="8" class="text-center text-muted">Cargando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/auth-ui.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+  <script src="../js/invoice-pdf.js"></script>
+  <script>
+    const API_INVOICES = '/api/invoices';
+    const tbody = document.getElementById('tbody');
+    const searchInput = document.getElementById('search');
+    const statusInput = document.getElementById('status');
+    const alertPlaceholder = document.getElementById('alertPlaceholder');
+
+    function showAlert(message, type) {
+      alertPlaceholder.innerHTML = '<div class="alert alert-' + (type || 'danger') + ' alert-dismissible fade show" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>';
+    }
+
+    function escapeHtml(value) {
+      const div = document.createElement('div');
+      div.textContent = value || '';
+      return div.innerHTML;
+    }
+
+    function getClientName(client) {
+      if (!client) return '-';
+      if (client.clientType === 'Company') return client.companyName || '-';
+      return ((client.firstName || '') + ' ' + (client.lastName || '')).trim() || '-';
+    }
+
+    function formatMoney(value) {
+      const n = parseFloat(value);
+      return 'RD$ ' + (isNaN(n) ? '0.00' : n.toFixed(2));
+    }
+
+    async function loadInvoices() {
+      alertPlaceholder.innerHTML = '';
+      const params = new URLSearchParams();
+      if (searchInput.value.trim()) params.set('search', searchInput.value.trim());
+      if (statusInput.value) params.set('status', statusInput.value);
+      const url = params.toString() ? API_INVOICES + '?' + params.toString() : API_INVOICES;
+
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center">Cargando...</td></tr>';
+      try {
+        const response = await fetch(url);
+        if (response.status === 401) throw new Error('AUTH');
+        if (!response.ok) throw new Error('LOAD');
+        const rows = await response.json();
+
+        if (!rows.length) {
+          tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No hay facturas.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = rows.map(i => {
+          const voucher = i.fiscalVoucher ? i.fiscalVoucher.voucherNumber : '-';
+          return '<tr>' +
+            '<td>' + i.id + '</td>' +
+            '<td><div class="fw-semibold">' + escapeHtml(i.invoiceCode || ('FACTURA-' + i.id)) + '</div><small class="text-muted">Emision: ' + escapeHtml((i.issueDate || '').slice(0, 10)) + '</small></td>' +
+            '<td>' + escapeHtml(getClientName(i.client)) + '</td>' +
+            '<td><span class="badge text-bg-secondary">' + escapeHtml(i.status || '-') + '</span></td>' +
+            '<td>' + escapeHtml(voucher) + '</td>' +
+            '<td class="text-end">' + formatMoney(i.grandTotal) + '</td>' +
+            '<td class="text-end">' + formatMoney(i.balanceDue) + '</td>' +
+            '<td class="text-end"><a class="btn btn-sm btn-outline-info me-1" href="view.html?id=' + i.id + '">Ver</a><button class="btn btn-sm btn-outline-success me-1" data-pdf="' + i.id + '">PDF</button><button class="btn btn-sm btn-outline-warning me-1" data-cancel="' + i.id + '">Cancelar</button><button class="btn btn-sm btn-outline-danger" data-delete="' + i.id + '">Eliminar</button></td>' +
+            '</tr>';
+        }).join('');
+
+        tbody.querySelectorAll('button[data-pdf]').forEach(btn => {
+          btn.addEventListener('click', () => downloadInvoicePdf(btn.dataset.pdf));
+        });
+
+        tbody.querySelectorAll('button[data-cancel]').forEach(btn => {
+          btn.addEventListener('click', () => cancelInvoice(btn.dataset.cancel));
+        });
+
+        tbody.querySelectorAll('button[data-delete]').forEach(btn => {
+          btn.addEventListener('click', () => deleteInvoice(btn.dataset.delete));
+        });
+      } catch (err) {
+        if (err && err.message === 'AUTH') {
+          showAlert('Debes iniciar sesion para ver facturas.', 'warning');
+          tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Inicia sesion para continuar.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">No se pudo cargar la lista.</td></tr>';
+      }
+    }
+
+    async function deleteInvoice(id) {
+      if (!confirm('Eliminar la factura #' + id + '?')) return;
+      try {
+        const response = await fetch(API_INVOICES + '/' + id, { method: 'DELETE' });
+        if (!response.ok) throw new Error('DELETE');
+        showAlert('Factura eliminada.', 'success');
+        loadInvoices();
+      } catch {
+        showAlert('No se pudo eliminar la factura.');
+      }
+    }
+
+    async function cancelInvoice(id) {
+      if (!confirm('Cancelar la factura #' + id + '?')) return;
+      try {
+        const response = await fetch(API_INVOICES + '/' + id + '/cancel', { method: 'POST' });
+        const result = await response.json();
+        if (!response.ok) {
+          showAlert((result.errors && result.errors.join('<br>')) || 'No se pudo cancelar la factura.');
+          return;
+        }
+        showAlert('Factura cancelada. Si tenia comprobante fiscal, fue liberado.', 'success');
+        loadInvoices();
+      } catch {
+        showAlert('No se pudo cancelar la factura.');
+      }
+    }
+
+    async function downloadInvoicePdf(id) {
+      try {
+        const response = await fetch(API_INVOICES + '/' + id);
+        if (!response.ok) throw new Error('LOAD');
+        const invoice = await response.json();
+        await window.InvoicePdf.generateInvoicePdf(invoice);
+      } catch {
+        showAlert('No se pudo descargar el PDF de la factura.');
+      }
+    }
+
+    document.getElementById('formSearch').addEventListener('submit', e => {
+      e.preventDefault();
+      loadInvoices();
+    });
+
+    document.getElementById('btnClear').addEventListener('click', () => {
+      searchInput.value = '';
+      statusInput.value = '';
+      loadInvoices();
+    });
+
+    window.addEventListener('airsolutions:auth', event => {
+      if (event && event.detail && event.detail.loggedIn) loadInvoices();
+    });
+    window.airsolutionsRefresh = loadInvoices;
+
+    loadInvoices();
+  </script>
+</body>
+</html>
