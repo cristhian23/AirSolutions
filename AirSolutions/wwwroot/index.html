@@ -1,283 +1,165 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AirSolutions</title>
+  <title>AirSolutions | Servicios de Aire Acondicionado</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   <link href="css/site.css" rel="stylesheet">
 </head>
-<body class="landing-bizland minimal-home">
+<body class="landing-bizland">
+  <div class="top-strip d-none d-lg-block">
+    <div class="container d-flex justify-content-between">
+      <span><i class="bi bi-telephone"></i> 809-657-3428</span>
+      <span><i class="bi bi-envelope"></i> airsolutionsrd@gmail.com</span>
+    </div>
+  </div>
+
   <header class="main-header sticky-top">
     <nav class="navbar navbar-expand-lg navbar-light">
       <div class="container">
-        <a class="navbar-brand brand-mark" href="/">Air<span>Solutions</span></a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+        <a class="navbar-brand brand-mark brand-with-logo" href="/"><img src="/logo.png" alt="AirSolutions logo"><span class="brand-title">Air<span>Solutions</span></span></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#publicNav">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="mainNav">
+        <div class="collapse navbar-collapse" id="publicNav">
           <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
-            <li class="nav-item"><a class="nav-link" href="clients/">Clientes</a></li>
-            <li class="nav-item"><a class="nav-link" href="catalog-items/">Catálogo</a></li>
-            <li class="nav-item"><a class="nav-link" href="quotes/">Cotizaciónes</a></li>
-            <li class="nav-item"><a class="nav-link" href="invoices/">Facturación</a></li>
-            <li class="nav-item">
-              <button id="openLoginBtn" type="button" class="btn btn-sm btn-outline-brand ms-lg-2" data-bs-toggle="modal" data-bs-target="#loginModal">Iniciar sesión</button>
-            </li>
-            <li class="nav-item d-none" id="welcomeItem">
-              <span id="welcomeText" class="nav-link mb-0"></span>
-            </li>
-            <li class="nav-item d-none" id="logoutItem">
-              <button id="logoutBtn" type="button" class="btn btn-sm btn-outline-secondary">Cerrar sesión</button>
-            </li>
+            <li class="nav-item"><a class="nav-link" href="#inicio">Inicio</a></li>
+            <li class="nav-item"><a class="nav-link" href="#nosotros">Nosotros</a></li>
+            <li class="nav-item"><a class="nav-link" href="#servicios">Servicios</a></li>
+            <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
           </ul>
         </div>
       </div>
     </nav>
   </header>
 
-  <main class="minimal-main">
+  <section class="hero-section" id="inicio">
+    <span class="hero-shape hero-shape-a"></span>
+    <span class="hero-shape hero-shape-b"></span>
     <div class="container">
-      <section class="assistant-shell">
-        <div class="assistant-box">
-          <h1>Asistente AirSolutions</h1>
-          <p>¿En qué puedo ayudarte?</p>
-
-          <div class="assistant-composer">
-            <textarea id="assistantMessage" class="form-control form-control-lg" rows="2" placeholder="Haz una cotización para Yaribel, primer nivel con palometas"></textarea>
-            <button id="assistantSendBtn" class="btn btn-brand btn-lg" type="button"><i class="bi bi-send"></i> Generar</button>
+      <div class="row align-items-center g-4">
+        <div class="col-lg-7">
+          <p class="hero-kicker">Soluciones profesionales en aire acondicionado</p>
+          <h1>Instalacion, mantenimiento y reparacion de aires acondicionados</h1>
+          <p class="hero-text">En AirSolutions brindamos servicios profesionales de instalacion, mantenimiento y reparacion de sistemas de aire acondicionado residenciales y comerciales. Trabajamos con diagnostico tecnico real, precios claros y soluciones eficientes para garantizar el mejor rendimiento de tu equipo.</p>
+          <div class="d-flex flex-wrap gap-2 mt-4">
+            <a class="btn btn-brand btn-lg" href="#contacto">Solicitar cotizacion</a>
+            <a class="btn btn-outline-brand btn-lg" href="#servicios">Ver servicios</a>
           </div>
-
-          <div id="assistantResult" class="assistant-result"></div>
         </div>
-      </section>
-    </div>
-  </main>
-
-  <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <form id="loginForm" novalidate>
-          <div class="modal-header">
-            <h2 class="modal-title fs-5">Iniciar sesión</h2>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        <div class="col-lg-5">
+          <div class="hero-panel">
+            <article class="panel-item">
+              <i class="bi bi-clipboard2-check"></i>
+              <div>
+                <h3>Diagnostico tecnico confiable</h3>
+                <p>Evaluamos tu equipo antes de recomendar cualquier reparacion o recarga.</p>
+              </div>
+            </article>
+            <article class="panel-item">
+              <i class="bi bi-cash-coin"></i>
+              <div>
+                <h3>Precios claros</h3>
+                <p>Cotizaciones transparentes segun el trabajo necesario.</p>
+              </div>
+            </article>
+            <article class="panel-item">
+              <i class="bi bi-person-badge"></i>
+              <div>
+                <h3>Servicio profesional</h3>
+                <p>Tecnicos capacitados y atencion responsable.</p>
+              </div>
+            </article>
           </div>
-          <div class="modal-body">
-            <div class="mb-3">
-              <label class="form-label" for="assistantUser">Usuario</label>
-              <input id="assistantUser" class="form-control" type="text" required>
-            </div>
-            <div>
-              <label class="form-label" for="assistantPass">Contraseña</label>
-              <input id="assistantPass" class="form-control" type="password" required>
-            </div>
-            <div id="loginResult" class="small mt-3 text-danger"></div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button id="assistantLoginBtn" type="submit" class="btn btn-brand">Entrar</button>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
+
+  <section class="section-space" id="nosotros">
+    <div class="container">
+      <div class="section-title mb-4">
+        <p class="eyebrow">Nosotros</p>
+        <h2>Experiencia, responsabilidad y soluciones reales</h2>
+      </div>
+      <div class="row g-4 align-items-stretch">
+        <div class="col-lg-7">
+          <article class="about-card h-100">
+            <h3>Especialistas en climatizacion residencial y comercial</h3>
+            <p>En AirSolutions contamos con experiencia en sistemas de aire acondicionado y un enfoque profesional en cada servicio. Nuestro objetivo es ofrecer soluciones duraderas, eficientes y adaptadas a las necesidades de cada cliente, priorizando siempre el buen funcionamiento del equipo.</p>
+            <ul>
+              <li><i class="bi bi-check2-circle"></i> Experiencia en instalacion y mantenimiento HVAC.</li>
+              <li><i class="bi bi-check2-circle"></i> Diagnostico previo antes de cualquier reparacion.</li>
+              <li><i class="bi bi-check2-circle"></i> Atencion personalizada y responsable.</li>
+            </ul>
+          </article>
+        </div>
+        <div class="col-lg-5">
+          <div class="stats-grid h-100">
+            <article>
+              <h3>HVAC</h3>
+              <p>Instalacion y mantenimiento profesional</p>
+            </article>
+            <article>
+              <h3>Real</h3>
+              <p>Diagnostico tecnico antes de reparar</p>
+            </article>
+            <article>
+              <h3>Claro</h3>
+              <p>Cotizaciones transparentes</p>
+            </article>
+            <article>
+              <h3>Soporte</h3>
+              <p>Atencion responsable y personalizada</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-space section-alt" id="servicios">
+    <div class="container">
+      <div class="section-title mb-4">
+        <p class="eyebrow">Servicios</p>
+        <h2>Soluciones completas en aire acondicionado</h2>
+      </div>
+      <div class="row g-3">
+        <div class="col-md-6 col-lg-4"><div class="service-chip"><i class="bi bi-fan"></i> Instalacion de aires acondicionados</div></div>
+        <div class="col-md-6 col-lg-4"><div class="service-chip"><i class="bi bi-tools"></i> Mantenimiento preventivo y correctivo</div></div>
+        <div class="col-md-6 col-lg-4"><div class="service-chip"><i class="bi bi-droplet-half"></i> Limpieza profunda de unidades</div></div>
+        <div class="col-md-6 col-lg-4"><div class="service-chip"><i class="bi bi-activity"></i> Diagnostico tecnico especializado</div></div>
+        <div class="col-md-6 col-lg-4"><div class="service-chip"><i class="bi bi-wrench-adjustable-circle"></i> Reparacion de averias</div></div>
+        <div class="col-md-6 col-lg-4"><div class="service-chip"><i class="bi bi-thermometer-snow"></i> Recarga de gas (solo cuando es necesario)</div></div>
+        <div class="col-md-6 col-lg-4"><div class="service-chip"><i class="bi bi-house"></i> Servicios residenciales y comerciales</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-band" id="contacto">
+    <div class="container text-center">
+      <h2>Necesitas servicio tecnico o una cotizacion?</h2>
+      <p class="mb-4">Contactanos y recibe una evaluacion profesional para tu sistema de aire acondicionado. En AirSolutions te ayudamos a enfriar mejor y gastar solo lo necesario.</p>
+      <div class="d-flex justify-content-center gap-2 flex-wrap">
+        <a class="btn btn-light btn-lg" href="https://wa.me/18096573428" target="_blank" rel="noopener noreferrer">Solicitar cotizacion</a>
+        <a class="btn btn-outline-light btn-lg" href="https://wa.me/18096573428" target="_blank" rel="noopener noreferrer">Contactar por WhatsApp</a>
+      </div>
+      <div class="mt-4">
+        <p class="mb-1"><strong>WhatsApp / Telefono:</strong> 809-657-3428</p>
+        <p class="mb-0"><strong>Email:</strong> airsolutionsrd@gmail.com</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container d-flex flex-wrap justify-content-between gap-2">
+      <span>&copy; AirSolutions - Servicios de instalacion y mantenimiento de aire acondicionado</span>
+      <a class="visually-hidden" href="/admin/">Acceso administrativo</a>
+    </div>
+  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="js/site.js"></script>
-  <script>
-    (function () {
-      const TOKEN_KEY = 'airsolutions_jwt';
-      const USER_KEY = 'airsolutions_user';
-      const API_AUTH = '/api/auth/login';
-      const API_ASSISTANT = '/api/assistant/interpret';
-
-      const openLoginBtn = document.getElementById('openLoginBtn');
-      const welcomeItem = document.getElementById('welcomeItem');
-      const logoutItem = document.getElementById('logoutItem');
-      const welcomeText = document.getElementById('welcomeText');
-      const logoutBtn = document.getElementById('logoutBtn');
-      const loginForm = document.getElementById('loginForm');
-      const userInput = document.getElementById('assistantUser');
-      const passInput = document.getElementById('assistantPass');
-      const loginResult = document.getElementById('loginResult');
-      const messageInput = document.getElementById('assistantMessage');
-      const sendBtn = document.getElementById('assistantSendBtn');
-      const resultBox = document.getElementById('assistantResult');
-
-      const loginModalElement = document.getElementById('loginModal');
-      const loginModal = new bootstrap.Modal(loginModalElement);
-
-      function getToken() {
-        return localStorage.getItem(TOKEN_KEY);
-      }
-
-      function getStoredUser() {
-        const raw = localStorage.getItem(USER_KEY);
-        if (!raw) return null;
-        try {
-          return JSON.parse(raw);
-        } catch {
-          return null;
-        }
-      }
-
-      function setSession(token, user) {
-        localStorage.setItem(TOKEN_KEY, token);
-        localStorage.setItem(USER_KEY, JSON.stringify(user || {}));
-      }
-
-      function clearSession() {
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(USER_KEY);
-      }
-
-      function pickDisplayName(user) {
-        if (!user) return '';
-        const source = (user.fullName || user.username || '').trim();
-        if (!source) return '';
-        return source.split(/\s+/)[0];
-      }
-
-      function setResult(message, type) {
-        const color = type === 'error' ? '#b42318' : type === 'success' ? '#067647' : '#475467';
-        resultBox.style.color = color;
-        resultBox.textContent = message;
-      }
-
-      function updateAuthUi() {
-        const token = getToken();
-        const user = getStoredUser();
-        const logged = !!token;
-
-        openLoginBtn.classList.toggle('d-none', logged);
-        welcomeItem.classList.toggle('d-none', !logged);
-        logoutItem.classList.toggle('d-none', !logged);
-
-        if (logged) {
-          const displayName = pickDisplayName(user) || 'Usuario';
-          welcomeText.textContent = 'Bienvenido ' + displayName + '';
-        } else {
-          welcomeText.textContent = '';
-        }
-      }
-
-      async function login() {
-        const username = userInput.value.trim();
-        const password = passInput.value.trim();
-        if (!username || !password) {
-          loginResult.textContent = 'Completa usuario y contraseña.';
-          return;
-        }
-
-        loginResult.textContent = '';
-        try {
-          const response = await fetch(API_AUTH, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-          });
-
-          const data = await response.json();
-          if (!response.ok || !data.accessToken) {
-            loginResult.textContent = (data && data.message) || 'No se pudo iniciar sesión.';
-            return;
-          }
-
-          setSession(data.accessToken, {
-            username: data.username || username,
-            fullName: data.fullName || data.username || username,
-            role: data.role || 'User'
-          });
-
-          updateAuthUi();
-          loginModal.hide();
-          passInput.value = '';
-          setResult('Sesión iniciada correctamente.', 'success');
-        } catch {
-          loginResult.textContent = 'Error de conexión al iniciar sesión.';
-        }
-      }
-
-      async function sendMessage() {
-        const message = messageInput.value.trim();
-        if (!message) {
-          setResult('Escribe una instruccion para continuar.', 'error');
-          return;
-        }
-
-        const token = getToken();
-        if (!token) {
-          loginModal.show();
-          setResult('Debes iniciar sesión para usar el asistente.', 'error');
-          return;
-        }
-
-        sendBtn.disabled = true;
-        setResult('Procesando solicitud...', 'info');
-
-        try {
-          const response = await fetch(API_ASSISTANT, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + token
-            },
-            body: JSON.stringify({
-              message,
-              context: { currentRoute: window.location.pathname }
-            })
-          });
-
-          const data = await response.json();
-          if (response.status === 401) {
-            clearSession();
-            updateAuthUi();
-            loginModal.show();
-            setResult('Sesión expirada. Inicia sesión nuevamente.', 'error');
-            return;
-          }
-
-          if (!response.ok) {
-            setResult((data && data.assistantMessage) || 'No se pudo procesar la solicitud.', 'error');
-            return;
-          }
-
-          setResult(data.assistantMessage || 'Solicitud procesada.', 'success');
-          if (data.action === 'open_quote_create') {
-            sessionStorage.setItem('quote_prefill', JSON.stringify(data.prefill || {}));
-            sessionStorage.setItem('quote_missing_fields', JSON.stringify(data.missingFields || []));
-            window.location.href = 'quotes/create.html?source=assistant';
-          }
-        } catch {
-          setResult('Error de conexión con el asistente.', 'error');
-        } finally {
-          sendBtn.disabled = false;
-        }
-      }
-
-      loginForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        login();
-      });
-
-      sendBtn.addEventListener('click', sendMessage);
-      messageInput.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          sendMessage();
-        }
-      });
-
-      logoutBtn.addEventListener('click', function () {
-        clearSession();
-        updateAuthUi();
-        setResult('Sesión cerrada.', 'info');
-      });
-
-      updateAuthUi();
-    })();
-  </script>
 </body>
 </html>
-

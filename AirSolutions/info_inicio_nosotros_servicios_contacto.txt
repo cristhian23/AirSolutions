@@ -1,0 +1,61 @@
+AIRSOLUTIONS - CONTENIDO DE SECCIONES
+
+SECCION: INICIO
+- Kicker: Gestiona tu negocio HVAC
+- Titulo principal: Soluciones para cotizar, facturar y escalar tus servicios tecnicos.
+- Descripcion: AirSolutions centraliza clientes, catalogo, cotizaciones y facturacion con una experiencia moderna para equipos de instalacion y mantenimiento de aire acondicionado.
+- Botones:
+  - Entrar al Admin (admin/)
+  - Ver modulos (#modulos)
+
+Panel destacado:
+- Cotizaciones en minutos: Genera propuestas claras con precios, impuestos y notas tecnicas.
+- Facturacion con control: Da seguimiento a cobros, estados de factura y comprobantes fiscales.
+- Asistente inteligente: Apoya la creacion de cotizaciones desde lenguaje natural en el panel admin.
+
+Tarjetas de valor:
+- Operacion agil: Reduce tiempos operativos al centralizar todo el flujo comercial.
+- Acceso seguro: Los modulos y el asistente estan protegidos para usuarios administradores.
+- Mejor seguimiento: Visualiza el estado de cada cotizacion y factura en tiempo real.
+
+
+SECCION: NOSOTROS
+- Encabezado: Nosotros
+- Titulo: Combinamos experiencia tecnica y gestion digital
+- Subtitulo interno: Plataforma pensada para empresas de climatizacion
+- Descripcion: Desde el primer contacto con el cliente hasta la facturacion final, AirSolutions organiza cada etapa del proceso comercial para que tu equipo se enfoque en entregar un servicio excelente.
+
+Puntos clave:
+- Base central de clientes y servicios.
+- Cotizaciones profesionales listas para enviar.
+- Facturacion y pagos con trazabilidad completa.
+
+Indicadores:
+- 100%: Flujo digital de punta a punta
+- 4: Modulos conectados en un solo panel
+- 24/7: Disponibilidad para operar cuando lo necesites
+- Admin: Control de acceso para proteger operaciones
+
+
+SECCION: SERVICIOS
+- Encabezado: Servicios
+- Titulo: Servicios orientados a crecimiento comercial
+- Lista de servicios:
+  - Instalaciones HVAC
+  - Mantenimiento preventivo
+  - Diagnostico tecnico
+  - Correccion de averias
+  - Proyectos residenciales y comerciales
+  - Gestion y seguimiento de ventas
+
+
+SECCION: CONTACTO
+- Titulo: Listo para operar con un flujo comercial moderno.
+- Descripcion: Solicita una demo o entra al panel para continuar gestionando tu operacion.
+- Botones:
+  - Ir al panel admin (admin/)
+  - Contactar equipo (mailto:contacto@airsolutions.do)
+
+Datos de contacto visibles en la franja superior:
+- Telefono: +1 (809) 000-0000
+- Email: contacto@airsolutions.do

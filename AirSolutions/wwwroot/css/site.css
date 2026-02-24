@@ -73,6 +73,23 @@ body {
   color: var(--brand);
 }
 
+.landing-bizland .brand-with-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.landing-bizland .brand-with-logo img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+
+.landing-bizland .brand-with-logo .brand-title {
+  display: inline-block;
+  line-height: 1;
+}
+
 .landing-bizland .nav-link {
   color: #213247;
   font-weight: 600;

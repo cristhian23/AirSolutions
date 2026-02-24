@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panel Admin - AirSolutions</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="../css/site.css" rel="stylesheet">
+</head>
+<body class="landing-bizland minimal-home module-page">
+  <header class="main-header sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <div class="container">
+        <a class="navbar-brand brand-mark brand-with-logo" href="/admin/"><img src="/logo.png" alt="AirSolutions logo"><span class="brand-title">Air<span>Solutions</span></span></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNav" aria-controls="adminNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="adminNav">
+          <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+            <li class="nav-item"><a class="nav-link" href="/clients/">Clientes</a></li>
+            <li class="nav-item"><a class="nav-link" href="/catalog-items/">Catalogo</a></li>
+            <li class="nav-item"><a class="nav-link" href="/quotes/">Cotizaciones</a></li>
+            <li class="nav-item"><a class="nav-link" href="/invoices/">Facturacion</a></li>
+            <li class="nav-item"><a class="btn btn-sm btn-outline-brand ms-lg-2" href="/">Sitio publico</a></li>
+            <li class="nav-item">
+              <button id="openLoginBtn" type="button" class="btn btn-sm btn-outline-brand ms-lg-1">Iniciar sesion</button>
+            </li>
+            <li class="nav-item d-none" id="welcomeItem">
+              <span id="welcomeText" class="nav-link mb-0"></span>
+            </li>
+            <li class="nav-item d-none" id="logoutItem">
+              <button id="logoutBtn" type="button" class="btn btn-sm btn-outline-secondary">Cerrar sesion</button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="minimal-main">
+    <div class="container">
+      <section class="assistant-shell">
+        <div class="assistant-box">
+          <h1>Panel Administrador</h1>
+          <p>Usa el asistente para iniciar cotizaciones y navegar tus modulos de gestion.</p>
+
+          <div class="assistant-composer">
+            <textarea id="assistantMessage" class="form-control form-control-lg" rows="2" placeholder="Crea una cotizacion para cliente residencial con dos unidades inverter"></textarea>
+            <button id="assistantSendBtn" class="btn btn-brand btn-lg" type="button"><i class="bi bi-send"></i> Generar</button>
+          </div>
+
+          <div id="assistantResult" class="assistant-result"></div>
+
+          <hr>
+          <div class="d-flex flex-wrap gap-2 mt-2">
+            <a class="btn btn-outline-primary" href="/clients/">Clientes</a>
+            <a class="btn btn-outline-primary" href="/catalog-items/">Catalogo</a>
+            <a class="btn btn-outline-primary" href="/quotes/">Cotizaciones</a>
+            <a class="btn btn-outline-primary" href="/invoices/">Facturacion</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/auth-ui.js"></script>
+  <script>
+    (function () {
+      const TOKEN_KEY = 'airsolutions_jwt';
+      const USER_KEY = 'airsolutions_user';
+      const API_ASSISTANT = '/api/assistant/interpret';
+
+      const messageInput = document.getElementById('assistantMessage');
+      const sendBtn = document.getElementById('assistantSendBtn');
+      const resultBox = document.getElementById('assistantResult');
+
+      function getToken() {
+        return localStorage.getItem(TOKEN_KEY);
+      }
+
+      function getStoredUser() {
+        const raw = localStorage.getItem(USER_KEY);
+        if (!raw) return null;
+        try {
+          return JSON.parse(raw);
+        } catch {
+          return null;
+        }
+      }
+
+      function isAdmin(user) {
+        return !!user && String(user.role || '').toLowerCase() === 'admin';
+      }
+
+      function setResult(message, type) {
+        const color = type === 'error' ? '#b42318' : type === 'success' ? '#067647' : '#475467';
+        resultBox.style.color = color;
+        resultBox.textContent = message;
+      }
+
+      function getNextPath() {
+        const params = new URLSearchParams(window.location.search);
+        const next = (params.get('next') || '').trim();
+        if (!next || !next.startsWith('/')) {
+          return '';
+        }
+        return next;
+      }
+
+      function ensureAdminSession() {
+        const token = getToken();
+        const user = getStoredUser();
+        if (!token || !isAdmin(user)) {
+          setResult('Inicia sesion como administrador para continuar.', 'error');
+          const loginBtn = document.getElementById('openLoginBtn');
+          if (loginBtn) {
+            loginBtn.click();
+          }
+          return false;
+        }
+        return true;
+      }
+
+      async function sendMessage() {
+        const message = messageInput.value.trim();
+        if (!message) {
+          setResult('Escribe una instruccion para continuar.', 'error');
+          return;
+        }
+
+        if (!ensureAdminSession()) {
+          return;
+        }
+
+        sendBtn.disabled = true;
+        setResult('Procesando solicitud...', 'info');
+
+        try {
+          const response = await fetch(API_ASSISTANT, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              message,
+              context: { currentRoute: window.location.pathname }
+            })
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            setResult((data && data.assistantMessage) || 'No se pudo procesar la solicitud.', 'error');
+            return;
+          }
+
+          setResult(data.assistantMessage || 'Solicitud procesada.', 'success');
+          if (data.action === 'open_quote_create') {
+            sessionStorage.setItem('quote_prefill', JSON.stringify(data.prefill || {}));
+            sessionStorage.setItem('quote_missing_fields', JSON.stringify(data.missingFields || []));
+            window.location.href = '/quotes/create.html?source=assistant';
+          }
+        } catch {
+          setResult('Error de conexion con el asistente.', 'error');
+        } finally {
+          sendBtn.disabled = false;
+        }
+      }
+
+      window.addEventListener('airsolutions:auth', function (event) {
+        const detail = event && event.detail ? event.detail : null;
+        if (!detail || !detail.loggedIn || !isAdmin(detail.user)) {
+          return;
+        }
+
+        const next = getNextPath();
+        if (next) {
+          window.location.href = next;
+        } else {
+          setResult('Sesion iniciada correctamente.', 'success');
+        }
+      });
+
+      sendBtn.addEventListener('click', sendMessage);
+      messageInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+
+      const nextOnLoad = getNextPath();
+      if (nextOnLoad && ensureAdminSession()) {
+        window.location.href = nextOnLoad;
+        return;
+      }
+
+      ensureAdminSession();
+    })();
+  </script>
+</body>
+</html>

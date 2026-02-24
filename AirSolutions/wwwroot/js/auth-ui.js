@@ -44,6 +44,44 @@
     return source.split(/\s+/)[0];
   }
 
+  function isAdminUser(user) {
+    return !!user && String(user.role || '').toLowerCase() === 'admin';
+  }
+
+  function isModuleAdminPath(pathname) {
+    return /^\/(clients|catalog-items|quotes|invoices)\//i.test(pathname || '');
+  }
+
+  function enforceAdminModuleAccess() {
+    const pathname = window.location.pathname || '';
+    if (!isModuleAdminPath(pathname)) {
+      return false;
+    }
+
+    const token = getToken();
+    const user = getStoredUser();
+    if (token && isAdminUser(user)) {
+      return false;
+    }
+
+    const next = window.location.pathname + window.location.search + window.location.hash;
+    window.location.href = '/admin/?next=' + encodeURIComponent(next);
+    return true;
+  }
+
+  function normalizeModuleHomeLinks() {
+    if (!isModuleAdminPath(window.location.pathname || '')) {
+      return;
+    }
+
+    document.querySelectorAll('a.nav-link[href="/"]').forEach(link => {
+      const text = (link.textContent || '').trim().toLowerCase();
+      if (text === 'inicio') {
+        link.setAttribute('href', '/admin/');
+      }
+    });
+  }
+
   function ensureLoginModal() {
     if (document.getElementById('globalLoginModal')) {
       return document.getElementById('globalLoginModal');
@@ -133,7 +171,15 @@
       }
 
       const isApiCall = /^\/api\//i.test(url) || /^https?:\/\/[^/]+\/api\//i.test(url);
-      if (!isApiCall || !token) {
+      const isAuthLogin = /\/api\/auth\/login$/i.test(url);
+      if (!isApiCall) {
+        return nativeFetch(input, init);
+      }
+
+      if (!token) {
+        if (!isAuthLogin) {
+          promptLoginRequired('Inicia sesión para cargar los datos.');
+        }
         return nativeFetch(input, init);
       }
 
@@ -149,6 +195,9 @@
           clearSession();
           updateAuthUi();
           emitAuthEvent(false, null);
+          if (!isAuthLogin) {
+            promptLoginRequired('Tu sesión expiró. Inicia sesión nuevamente.');
+          }
         }
         return response;
       });
@@ -163,6 +212,24 @@
   const userInput = document.getElementById('globalAssistantUser');
   const passInput = document.getElementById('globalAssistantPass');
   const loginResult = document.getElementById('globalLoginResult');
+  let lastLoginPromptAt = 0;
+
+  function promptLoginRequired(message) {
+    const now = Date.now();
+    if (now - lastLoginPromptAt < 1500) {
+      return;
+    }
+
+    lastLoginPromptAt = now;
+    loginResult.textContent = message || 'Debes iniciar sesión para ver la información.';
+    loginModal.show();
+  }
+
+  if (enforceAdminModuleAccess()) {
+    return;
+  }
+
+  normalizeModuleHomeLinks();
 
   let pendingAuthRefresh = false;
 
@@ -232,6 +299,9 @@
     updateAuthUi();
     emitAuthEvent(false, null);
     refreshModuleData();
+    if (isModuleAdminPath(window.location.pathname || '')) {
+      window.location.href = '/admin/';
+    }
   });
 
   updateAuthUi();
